@@ -63,18 +63,22 @@ function insertNewCommand(commandInsertZone, kind) {
 function createCommand(kind, isTemplate) {
     console.assert(elemCommandTemplate != null);
 
+    // Fetch descriptor
     let descriptor = commandDescriptors.get(kind);
     console.assert(descriptor != null);
 
+    // Clone the command template
     let template = elemCommandTemplate;
     let elemCommand = template.cloneNode(/* deep: */ true);
 
+    // Set event listeners, class name and some attributes
     elemCommand.id = "";
     elemCommand.addEventListener("dragstart", handlerCommandDragStart);
     elemCommand.addEventListener("drag", function(e) {});
     elemCommand.className += ' ' + descriptor.cssClass;
     elemCommand.setAttribute('commandkind', kind);
 
+    // Find the label element and set it
     let elemLabel = elemCommand.querySelector(".label");
     if(elemLabel != null) {
         elemLabel.innerHTML = descriptor.label;
@@ -82,17 +86,22 @@ function createCommand(kind, isTemplate) {
 
     let elemArgument = elemCommand.querySelector(".argument");
     if(elemArgument != null) {
+        // Does this command have an argument?
         if(descriptor.hasArgument || descriptor.hasArgument === undefined) {
-            console.log(descriptor);
+            // Set the validation pattern
             let pattern = argumentPatterns[descriptor.argumentPatternKey];
             elemArgument.setAttribute('pattern', pattern);
+            // Force validation on each input event
             elemArgument.setAttribute('oninput', 'this.reportValidity()');
         } else {
+            // No argument, remove the input field
             elemArgument.remove();
         }
     }
 
     if(descriptor.hasSubcommands === true && !isTemplate) {
+        // This command has subcommands, enable the subblock area
+
         // Make the subblock div visible
         elemCommand.className += " commandHasSubcommands";
 
@@ -100,6 +109,7 @@ function createCommand(kind, isTemplate) {
         let elemInsertZone = elemCommand.querySelector(".commandInsertZone");
         elemInsertZone.removeAttribute("disabled");
 
+        // Make the zone a dropzone
         elemInsertZone.addEventListener("drop", handlerCommandBlockDrop);
         elemInsertZone.addEventListener("dragover", ev => {
             ev.preventDefault();
@@ -165,9 +175,8 @@ function handlerCommandBlockDrop(ev) {
     ev.preventDefault();
 }
 
-function initProgram() {
-    document.addEventListener("drag", function(ev) {
-    });
+function setupListeners() {
+    document.addEventListener("drag", ev => {});
     document.addEventListener("dragstart", ev => {});
     document.addEventListener("dragend", handlerDragEnd);
 
@@ -180,12 +189,14 @@ function initProgram() {
 }
 
 function linkUIElements() {
+    // Find some important nodes in the DOM
     elemToolbar = document.getElementById("toolbar");
     elemControl = document.getElementById("control");
     elemCommandTemplate = document.getElementById("commandTemplate");
 }
 
 function fillToolbar() {
+    // Fill the command toolbar
     console.assert(elemToolbar != null);
 
     for(let kind of COMMAND_KIND) {
@@ -200,6 +211,6 @@ function fillToolbar() {
 
 window.addEventListener("load", function(ev) {
     linkUIElements();
-    initProgram();
+    setupListeners();
     fillToolbar();
 });
