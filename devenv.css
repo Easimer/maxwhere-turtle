@@ -1,0 +1,65 @@
+#toolbar {
+    border: 1px solid black;
+}
+
+#control {
+    border: 1px solid red;
+    padding: 0.25em;
+}
+
+.program {
+    border: 1px solid black;
+    height: 50vh;
+}
+
+.baseCommand {
+    padding: 0.50em;
+    margin: 0.125em;
+    border: 1px solid black;
+    min-width: 140px;
+    background-color: white;
+    display: inline-block;
+}
+
+#commandTemplate {
+    display: none;
+}
+
+.subcommands {
+    display: none;
+}
+
+.commandHasSubcommands > .subcommands {
+    display: block;
+    margin: 0.5em;
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
+    border: 1px dotted black;
+    padding-left: 1em;
+}
+
+input[pattern]:invalid {
+    color: red;
+}
+
+.baseCommand > .argument {
+    max-width: 4em;
+}
+
+.commandInsertZone {
+    width: 100%;
+    min-height: 10px;
+    border: 1px dashed grey;
+}
+
+.cmdMove {
+    background-color: #3E68ED;
+}
+
+.cmdControl {
+    background-color: #FFC9DA;
+}
+
+.cmdStack {
+    background-color: #AAAAAA;
+}
