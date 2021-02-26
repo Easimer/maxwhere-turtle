@@ -27,6 +27,26 @@ const commandDescriptors = new Map([
         label : "Move forward",
         cssClass : "cmdMove",
     }],
+    ["MOVE_BACKWARD", {
+        argumentPatternKey : "decimal",
+        label : "Move backward",
+        cssClass : "cmdMove",
+    }],
+    ["ROTATE_YAW", {
+        argumentPatternKey : "decimal",
+        label : "Rotate yaw",
+        cssClass : "cmdRotate",
+    }],
+    ["ROTATE_PITCH", {
+        argumentPatternKey : "decimal",
+        label : "Rotate pitch",
+        cssClass : "cmdRotate",
+    }],
+    ["ROTATE_ROLL", {
+        argumentPatternKey : "decimal",
+        label : "Rotate roll",
+        cssClass : "cmdRotate",
+    }],
     ["REPEAT", {
         argumentPatternKey : "integer",
         label : "Repeat N times",

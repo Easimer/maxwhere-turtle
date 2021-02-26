@@ -19,6 +19,8 @@
     min-width: 140px;
     background-color: white;
     display: inline-block;
+
+    font-family: sans-serif;
 }
 
 #commandTemplate {
@@ -53,7 +55,7 @@ input[pattern]:invalid {
 }
 
 .cmdMove {
-    background-color: #3E68ED;
+    background-color: #6CEBEA;
 }
 
 .cmdControl {
@@ -62,4 +64,8 @@ input[pattern]:invalid {
 
 .cmdStack {
     background-color: #AAAAAA;
+}
+
+.cmdRotate {
+    background-color: #A5DE33;
 }
