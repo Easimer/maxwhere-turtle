@@ -9,7 +9,7 @@
 
 .program {
     border: 1px solid black;
-    height: 50vh;
+    min-height: 50vh;
 }
 
 .baseCommand {
