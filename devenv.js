@@ -195,6 +195,12 @@ function handlerCommandBlockDrop(ev) {
     ev.preventDefault();
 }
 
+function handlerRunProgram(ev) {
+    let elemProgram = document.querySelector(".program")
+    let programAST = makeProgramAST(elemProgram)
+    console.log(dumpAST(programAST));
+}
+
 function setupListeners() {
     document.addEventListener("drag", ev => {});
     document.addEventListener("dragstart", ev => {});
@@ -206,6 +212,8 @@ function setupListeners() {
     document.addEventListener("dragleave", handlerDragLeave);
 
     document.addEventListener("drop", handlerDragDrop);
+
+    document.getElementById("btnRun").addEventListener("click", handlerRunProgram);
 }
 
 function linkUIElements() {
