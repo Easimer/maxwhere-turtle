@@ -173,8 +173,11 @@ function createCommand(kind, isTemplate) {
         });
     }
 
-    let elemDeleteBtn = elemCommand.querySelector(".delete-cmd")
-    elemDeleteBtn.addEventListener('click', _ => removeCommand(elemCommand))
+    if(!isTemplate) {
+        let elemDeleteBtn = elemCommand.querySelector(".delete-cmd")
+        elemDeleteBtn.addEventListener('click', _ => removeCommand(elemCommand))
+        elemDeleteBtn.removeAttribute('disabled')
+    }
 
     return elemCommand;
 }
