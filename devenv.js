@@ -14,6 +14,10 @@ const COMMAND_KIND = [
 
     "STATE_PUSH"      ,
     "STATE_POP"       ,
+
+    "PEN_DOWN"        ,
+    "PEN_UP"          ,
+    "PEN_COLOR"       ,
 ];
 
 const argumentPatterns = {
@@ -63,6 +67,21 @@ const commandDescriptors = new Map([
         label : "Restore state",
         cssClass : "cmdStack",
     }],
+    ["PEN_DOWN", {
+        hasArgument : false,
+        label : "Pen down",
+        cssClass : "cmdPen",
+    }],
+    ["PEN_UP", {
+        hasArgument : false,
+        label : "Pen up",
+        cssClass : "cmdPen",
+    }],
+    ["PEN_COLOR", {
+        label : "Set pen color",
+        cssClass : "cmdPen",
+        inputType : "color",
+    }],
 ]);
 
 function insertNewCommand(commandInsertZone, kind) {
@@ -109,10 +128,18 @@ function createCommand(kind, isTemplate) {
         // Does this command have an argument?
         if(descriptor.hasArgument || descriptor.hasArgument === undefined) {
             // Set the validation pattern
-            let pattern = argumentPatterns[descriptor.argumentPatternKey];
-            elemArgument.setAttribute('pattern', pattern);
-            // Force validation on each input event
-            elemArgument.setAttribute('oninput', 'this.reportValidity()');
+            let patternKey = descriptor.argumentPatternKey;
+            if(patternKey !== undefined) {
+                let pattern = argumentPatterns[descriptor.argumentPatternKey];
+                elemArgument.setAttribute('pattern', pattern);
+                // Force validation on each input event
+                elemArgument.setAttribute('oninput', 'this.reportValidity()');
+            }
+
+            let inputType = descriptor.inputType;
+            if(inputType !== undefined) {
+                elemArgument.setAttribute("type", inputType);
+            }
         } else {
             // No argument, remove the input field
             elemArgument.remove();

@@ -69,3 +69,7 @@ input[pattern]:invalid {
 .cmdRotate {
     background-color: #A5DE33;
 }
+
+.cmdPen {
+    background-color: #F5CF7A;
+}
