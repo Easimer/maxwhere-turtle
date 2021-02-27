@@ -241,6 +241,20 @@ function handlerRunProgram(ev) {
     console.log(dumpAST(programAST));
 }
 
+function clearProgram() {
+    let elemProgram = document.querySelector(".program")
+    // Remove all child nodes
+    while(elemProgram.childNodes.length > 0) {
+        elemProgram.removeChild(elemProgram.lastChild);
+    }
+
+    elemProgram.appendChild(makeCommandInsertZone())
+}
+
+function handlerClearProgram(ev) {
+    clearProgram();
+}
+
 function setupListeners() {
     document.addEventListener("drag", ev => {});
     document.addEventListener("dragstart", ev => {});
@@ -254,6 +268,7 @@ function setupListeners() {
     document.addEventListener("drop", handlerDragDrop);
 
     document.getElementById("btnRun").addEventListener("click", handlerRunProgram);
+    document.getElementById("btnClear").addEventListener("click", handlerClearProgram);
 }
 
 function linkUIElements() {

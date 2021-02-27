@@ -16,11 +16,12 @@
     padding: 0.50em;
     margin: 0.125em;
     border: 1px solid black;
-    min-width: 140px;
-    background-color: white;
+    min-width: 16em;
+    min-height: 1.5em;
     display: inline-block;
 
     font-family: sans-serif;
+    text-align: left;
 }
 
 #commandTemplate {
