@@ -99,6 +99,16 @@ function insertNewCommand(commandInsertZone, kind) {
     elemParent.insertBefore(elemInsertZoneAfter, elemCmd.nextSibling);
 }
 
+function removeCommand(elemCommand) {
+    // Remove the command insertion zones before and after the command
+    let elemPrevCIZ = elemCommand.nextElementSibling
+    let elemNextCIZ = elemCommand.previousElementSibling
+    elemPrevCIZ.remove()
+    elemNextCIZ.remove()
+    // Replace the command itself with a new CIZ
+    elemCommand.replaceWith(makeCommandInsertZone())
+}
+
 function createCommand(kind, isTemplate) {
     console.assert(elemCommandTemplate != null);
 
@@ -162,6 +172,9 @@ function createCommand(kind, isTemplate) {
             ev.preventDefault();
         });
     }
+
+    let elemDeleteBtn = elemCommand.querySelector(".delete-cmd")
+    elemDeleteBtn.addEventListener('click', _ => removeCommand(elemCommand))
 
     return elemCommand;
 }

@@ -54,6 +54,12 @@ input[pattern]:invalid {
     border: 1px dashed grey;
 }
 
+.delete-cmd {
+    margin-right: 12px;
+    color: #DD1111;
+    font-weight: bold;
+}
+
 .cmdMove {
     background-color: #6CEBEA;
 }
