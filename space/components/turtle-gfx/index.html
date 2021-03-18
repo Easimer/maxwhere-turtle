@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body style="background: grey">
+  <button onclick="moveLeftBy5cm()">Left by 5cm</button>
+  <button onclick="moveRightBy5cm()">Right by 5cm</button>
+</body>
+<script>
+  const { ipcRenderer } = require('electron')
+  moveLeftBy5cm = function() {
+    ipcRenderer.send('compdev-tutorial-billboard-interactive-move', -5)
+  }
+
+  moveRightBy5cm = function() {
+    ipcRenderer.send('compdev-tutorial-billboard-interactive-move', 5)
+  }
+</script>
+</html>

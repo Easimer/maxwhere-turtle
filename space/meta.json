@@ -1,0 +1,25 @@
+{
+  "description": {
+    "full": "Turtle graphics",
+    "short": "Turtle graphics"
+  },
+  "isPrivate": true,
+  "isPublic": false,
+  "mainTag": "",
+  "meta": {
+    "affliliation": "",
+    "creator": "Daniel Meszaros",
+    "webtables": 1
+  },
+  "mwDomain": [],
+  "name": "Turtle Gfx",
+  "price": 0,
+  "remoteVersion": 8,
+  "tags": [],
+  "thumbnails": [
+    "fa0d0b28-bd7b-40ab-a906-177b00c575a4"
+  ],
+  "updatedAt": "2019-12-20T01:10:41.659Z",
+  "version": 8,
+  "uuid": "6887b34c-5397-4b70-a630-703399ec8638"
+}

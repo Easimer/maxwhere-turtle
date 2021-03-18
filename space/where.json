@@ -1,0 +1,51 @@
+{
+  "deploy-name": "Turtle Gfx",
+  "version": "1.0.1",
+  "main": "index.jsx",
+  "environment": {
+    "background": {
+      "r": 0.12,
+      "g": 0.16,
+      "b": 0.24,
+      "a": 1
+    },
+    "ambient": {
+      "r": 0.12,
+      "g": 0.16,
+      "b": 0.24,
+      "a": 1
+    },
+    "skybox": {
+      "material": "Erad_skybox"
+    }
+  },
+  "camera": {
+    "position": {
+      "x": -1538.560791015625,
+      "y": 491.9812927246094,
+      "z": 1820.4752197265625
+    },
+    "orientation": {
+      "w": -0.8558657765388489,
+      "x": 0.06331343203783035,
+      "y": 0.5119099617004395,
+      "z": 0.03786854073405266
+    }
+  },
+  "local": "./resources",
+  "description": {
+    "short": "Turtle graphics",
+    "full": "Turtle graphics"
+  },
+  "tags": [
+    "private"
+  ],
+  "meta": {
+    "creator": "Daniel Meszaros",
+    "affiliation": ""
+  },
+  "components": {
+    "turtle-gfx": "./components/turtle-gfx/component.json"
+  }
+  
+}
