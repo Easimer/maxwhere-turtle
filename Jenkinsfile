@@ -21,7 +21,9 @@ pipeline {
 
     stages {
         stage('Mark deployment as pending') {
-            setBuildStatus("Deployment has started", "PENDING");
+            steps {
+                setBuildStatus("Deployment has started", "PENDING");
+            }
         }
         stage('Clean deployment directory') {
             steps {
