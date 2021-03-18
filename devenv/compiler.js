@@ -53,7 +53,6 @@ function traverseHtmlTree(tree, nodeConverter) {
 function makeProgramAST(treeRoot) {
     var ret = parserNodeConverter.makeEmpty();
     ret = processSubcommands(ret, treeRoot, parserNodeConverter);
-    console.log(ret);
     return ret;
 }
 

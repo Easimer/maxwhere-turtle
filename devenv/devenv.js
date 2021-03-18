@@ -241,7 +241,16 @@ function handlerCommandBlockDrop(ev) {
 function handlerRunProgram(ev) {
     let elemProgram = document.querySelector(".program")
     let programAST = makeProgramAST(elemProgram)
-    console.log(dumpAST(programAST));
+
+    const onError = () => {
+        alert("Failed to connect to ws://localhost:8080!");
+    };
+
+    const onSuccess = () => {
+        console.log("Sent program!");
+    };
+
+    sendProgram("ws://localhost:8080", programAST, onSuccess, onError);
 }
 
 function clearProgram() {

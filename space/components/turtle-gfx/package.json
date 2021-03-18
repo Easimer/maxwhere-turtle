@@ -1,0 +1,16 @@
+{
+  "name": "turtle-gfx",
+  "version": "1.0.0",
+  "description": "Turtle graphics VM server",
+  "repository": "https://github.com/easimer/maxwhere-turtle",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "GPL-3.0-or-later",
+  "dependencies": {
+    "ws": "^7.4.4",
+    "electron-log": "^4.3.2"
+  }
+}
