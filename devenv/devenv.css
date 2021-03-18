@@ -1,0 +1,86 @@
+html, body {
+    background-color: white;
+}
+
+#toolbar {
+    border: 1px solid black;
+}
+
+#control {
+    border: 1px solid red;
+    padding: 0.25em;
+}
+
+.program {
+    border: 1px solid black;
+    min-height: 50vh;
+}
+
+.baseCommand {
+    padding: 0.50em;
+    margin: 0.125em;
+    border: 1px solid black;
+    min-width: 16em;
+    min-height: 1.5em;
+    display: inline-block;
+
+    font-family: sans-serif;
+    text-align: left;
+}
+
+#commandTemplate {
+    display: none;
+}
+
+.subcommands {
+    display: none;
+}
+
+.commandHasSubcommands > .subcommands {
+    display: block;
+    margin: 0.5em;
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
+    border-left: 1px dashed black;
+    padding-left: 1em;
+}
+
+input[pattern]:invalid {
+    color: red;
+}
+
+.baseCommand > .argument {
+    max-width: 4em;
+}
+
+.commandInsertZone {
+    width: 100%;
+    min-height: 10px;
+    border: 1px dashed grey;
+}
+
+.delete-cmd {
+    margin-right: 12px;
+    color: #DD1111;
+    font-weight: bold;
+}
+
+.cmdMove {
+    background-color: #6CEBEA;
+}
+
+.cmdControl {
+    background-color: #FFC9DA;
+}
+
+.cmdStack {
+    background-color: #AAAAAA;
+}
+
+.cmdRotate {
+    background-color: #A5DE33;
+}
+
+.cmdPen {
+    background-color: #F5CF7A;
+}
