@@ -1,7 +1,7 @@
 void setBuildStatus(String message, String state) {
   step([
       $class: "GitHubCommitStatusSetter",
-      reposSource: [$class: "ManuallyEnteredRepositorySource", url: "https://github.com/Easimer/trigen"],
+      reposSource: [$class: "ManuallyEnteredRepositorySource", url: "https://github.com/Easimer/maxwhere-turtle"],
       contextSource: [$class: "ManuallyEnteredCommitContextSource", context: "ci/jenkins/build-status"],
       errorHandlers: [[$class: "ChangingBuildStatusErrorHandler", result: "UNSTABLE"]],
       statusResultSource: [ $class: "ConditionalStatusResultSource", results: [[$class: "AnyBuildResult", message: message, state: state]] ]
@@ -16,7 +16,7 @@ pipeline {
     }
 
     parameters {
-        string(name: "DEPLOY_DIR", defaultValue: "/srv/www-data.mnt/maxwhere-turtle/", description: "Where to deploy the dev env")
+        string(name: "DEPLOY_DIR", defaultValue: "/srv/www-data.mnt/public/maxwhere-turtle/", description: "Where to deploy the dev env")
     }
 
     stages {
