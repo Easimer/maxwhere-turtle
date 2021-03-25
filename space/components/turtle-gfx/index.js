@@ -37,26 +37,17 @@ function eulerToQuaternion(yaw, pitch, roll) {
   return {w: w, x: x, y: y, z: z};
 }
 
-function getTurtleDirectionVector(state) {
-  let dx = Math.cos(state.yaw) * Math.cos(state.pitch);
-  let dy = Math.sin(state.yaw) * Math.cos(state.pitch);
-  let dz = Math.sin(state.pitch);
+function getTurtleDirectionVector(rotation) {
+  let dx = Math.cos(rotation.yaw) * Math.cos(rotation.pitch);
+  let dy = Math.sin(rotation.yaw) * Math.cos(rotation.pitch);
+  let dz = Math.sin(rotation.pitch);
   return { x: dx, y: dy, z: dz };
 }
 
-function setStatePosition(state, vec) {
-  state.x = vec.x;
-  state.y = vec.y;
-  state.z = vec.z;
-}
-
-function getStatePosition(state) {
-  return { x: state.x, y: state.y, z: state.z };
-}
-
-function updateTurtleObject(state) {
-  hTurtle.setOrientation(eulerToQuaternion(state.yaw, state.pitch, state.roll));
-  hTurtle.setPosition(getStatePosition(state));
+function updateTurtleObject(turtle) {
+  const rotation = turtle.rotation;
+  hTurtle.setOrientation(eulerToQuaternion(rotation.yaw, rotation.pitch, rotation.roll));
+  hTurtle.setPosition(turtle.position);
 }
 
 function vecScaleAdd(lhs, scale, rhs) {
@@ -67,12 +58,12 @@ function vecScaleAdd(lhs, scale, rhs) {
   };
 }
 
-function createLineSegment(state, length) {
+function createLineSegment(position, rotation, length) {
   log.debug('creating segment');
   let segment = wom.create('mesh', {
     url: 'line.mesh',
-    position: { 'x': state.x, 'y': state.y, 'z': state.z },
-    rotation: eulerToQuaternion(state.yaw, state.pitch, state.roll),
+    position: position,
+    rotation: eulerToQuaternion(rotation.yaw, rotation.pitch, rotation.roll),
     scale: { x: length, y: 1, z: 1 }
   });
 
@@ -92,20 +83,24 @@ const vmDispatchTable = {
     }
   },
   'MOVE_FORWARD' : (state, instruction) => {
+    const turtle = state.turtle;
+
     const distance = parseInt(instruction.arg);
-    let dir = getTurtleDirectionVector(state.state);
-    let newPos = vecScaleAdd(getStatePosition(state.state), distance, dir);
-    createLineSegment(state.state, distance);
-    setStatePosition(state.state, newPos);
-    updateTurtleObject(state.state);
+    let dir = getTurtleDirectionVector(turtle.rotation);
+    let newPos = vecScaleAdd(turtle.position, distance, dir);
+    createLineSegment(turtle.position, turtle.rotation, distance);
+    turtle.position = newPos;
+    updateTurtleObject(turtle);
   },
 
   'MOVE_BACKWARD' : (state, instruction) => {
+    const turtle = state.turtle;
+
     const distance = parseInt(instruction.arg);
-    let dir = getTurtleDirectionVector(state.state);
-    let newPos = vecScaleAdd(getStatePosition(state.state), -distance, dir);
-    setStatePosition(state.state, newPos);
-    updateTurtleObject(state.state);
+    let dir = getTurtleDirectionVector(turtle.rotation);
+    let newPos = vecScaleAdd(turtle.position, -distance, dir);
+    turtle.position = newPos;
+    updateTurtleObject(turtle);
   },
 
   'ROTATE_YAW' : (state, instruction) => {
@@ -127,12 +122,12 @@ const vmDispatchTable = {
   },
 
   'STATE_PUSH' : (state, instruction) => {
-    state.stack.push(Object.assign({}, state.state));
+    state.stack.push(Object.assign({}, state.turtle));
   },
 
   'STATE_POP' : (state, instruction) => {
-    state.state = Object.assign({}, state.stack.pop());
-    updateTurtleObject(state.state);
+    state.turtle = Object.assign({}, state.stack.pop());
+    updateTurtleObject(state.turtle);
   },
 
   'PEN_DOWN' : (state, instruction) => {
@@ -154,11 +149,11 @@ function decodeInstruction(state, instruction) {
 function executeProgram(program) {
   var state = {
     stack: [],
-    state: {
-      x: 0, y: 0, z: 0,
-      yaw: 0, pitch: 0, roll: 0,
+    turtle: {
+      position: { x: 0, y: 0, z: 0 },
+      rotation: { yaw: 0, pitch: 0, roll: 0 },
       pen_active: true,
-      r: 255, g: 0, b: 0,
+      pen_color: { r: 255, g: 0, b: 0 },
     }
   };
   resetTurtle();
