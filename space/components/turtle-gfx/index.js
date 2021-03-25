@@ -1,3 +1,4 @@
+/* global __dirname */
 const { wom } = require('maxwhere');
 const { ipcMain  } = require('electron');
 const path = require('path');
@@ -185,7 +186,7 @@ const done = () => {
 
 const IPC_CHANNEL_DEBUG = 'turtle-debug';
 
-const render = (props, children) => {
+const render = (/*props, children*/) => {
   let debugPanel = wom.create('billboard', {
     url: path.resolve(__dirname, 'index.html'),
     nodeIntegration: true, // need this for IPC communication
@@ -193,8 +194,8 @@ const render = (props, children) => {
     height: 330,
     'resolution-width': 1600,
     'resolution-height': 900,
-    position: { "x": 100, "y": 100, "z": -10 },
-    orientation: { "x": 0, "y": 0, "z": 0, "w": -1 },
+    position: { 'x': 100, 'y': 100, 'z': -10 },
+    orientation: { 'x': 0, 'y': 0, 'z': 0, 'w': -1 },
     physical: {raycast: true} // accept mouse events to make it orbitable
   });
   wom.render(debugPanel);
