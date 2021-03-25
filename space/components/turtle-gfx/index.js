@@ -12,9 +12,13 @@ const TURTLE_INIT_SCALE = 1.0;
 let wsServer = null;
 let hTurtle = null;
 
+let lineSegmentContainer = null;
+
 function resetTurtle() {
   hTurtle.setPosition(TURTLE_INIT_POSITION, 'absolute', 'world');
   hTurtle.setOrientation(TURTLE_INIT_ORIENTATION);
+
+  lineSegmentContainer.clear();
 }
 
 function eulerToQuaternion(yaw, pitch, roll) {
@@ -63,6 +67,22 @@ function vecScaleAdd(lhs, scale, rhs) {
   };
 }
 
+function createLineSegment(state, length) {
+  log.debug('creating segment');
+  let segment = wom.create('mesh', {
+    url: 'line.mesh',
+    position: { 'x': state.x, 'y': state.y, 'z': state.z },
+    rotation: eulerToQuaternion(state.yaw, state.pitch, state.roll),
+    scale: { x: length, y: 1, z: 1 }
+  });
+
+  log.debug('created segment');
+  lineSegmentContainer.appendChild(segment);
+  log.debug('appended segment');
+  wom.render(segment);
+  log.debug('rendered segment');
+}
+
 const vmDispatchTable = {
   'TOP' : (state, instruction) => {
     log.debug('processing children');
@@ -75,6 +95,7 @@ const vmDispatchTable = {
     const distance = parseInt(instruction.arg);
     let dir = getTurtleDirectionVector(state.state);
     let newPos = vecScaleAdd(getStatePosition(state.state), distance, dir);
+    createLineSegment(state.state, distance);
     setStatePosition(state.state, newPos);
     updateTurtleObject(state.state);
   },
@@ -209,6 +230,9 @@ const render = (/*props, children*/) => {
     autophysical: true
   });
   wom.render(hTurtle);
+
+  lineSegmentContainer = wom.create('node');
+  wom.render(lineSegmentContainer);
   
   ipcMain.removeAllListeners(IPC_CHANNEL_DEBUG);
   ipcMain.on(IPC_CHANNEL_DEBUG, (event, payload) => {
