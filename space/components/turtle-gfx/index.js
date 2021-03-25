@@ -6,10 +6,10 @@ const log = require('electron-log');
 
 const TURTLE_INIT_POSITION = { x: 0, y: 0, z: 0 };
 const TURTLE_INIT_ORIENTATION = { w: -1, x: 0, y: 0, z: 0 };
-const TURTLE_INIT_SCALE = 1.0
+const TURTLE_INIT_SCALE = 1.0;
 
 let wsServer = null;
-let hTurtle = null
+let hTurtle = null;
 
 function resetTurtle() {
   hTurtle.setPosition(TURTLE_INIT_POSITION, 'absolute', 'world');
@@ -64,9 +64,9 @@ function vecScaleAdd(lhs, scale, rhs) {
 
 const vmDispatchTable = {
   'TOP' : (state, instruction) => {
-    log.debug("processing children");
+    log.debug('processing children');
     for(const child of instruction.children) {
-      log.debug("processing child " + child.id);
+      log.debug('processing child ' + child.id);
       decodeInstruction(state, child);
     }
   },
@@ -78,7 +78,7 @@ const vmDispatchTable = {
     updateTurtleObject(state.state);
   },
 
-  "MOVE_BACKWARD" : (state, instruction) => {
+  'MOVE_BACKWARD' : (state, instruction) => {
     const distance = parseInt(instruction.arg);
     let dir = getTurtleDirectionVector(state.state);
     let newPos = vecScaleAdd(getStatePosition(state.state), -distance, dir);
@@ -86,16 +86,16 @@ const vmDispatchTable = {
     updateTurtleObject(state.state);
   },
 
-  "ROTATE_YAW" : (state, instruction) => {
+  'ROTATE_YAW' : (state, instruction) => {
   },
 
-  "ROTATE_PITCH" : (state, instruction) => {
+  'ROTATE_PITCH' : (state, instruction) => {
   },
 
-  "ROTATE_ROLL" : (state, instruction) => {
+  'ROTATE_ROLL' : (state, instruction) => {
   },
 
-  "REPEAT" : (state, instruction) => {
+  'REPEAT' : (state, instruction) => {
     const times = parseInt(instruction.arg);
     for(var i = 0; i < times; i++) {
       for(const child of instruction.children) {
@@ -104,27 +104,27 @@ const vmDispatchTable = {
     }
   },
 
-  "STATE_PUSH" : (state, instruction) => {
+  'STATE_PUSH' : (state, instruction) => {
     state.stack.push(Object.assign({}, state.state));
   },
 
-  "STATE_POP" : (state, instruction) => {
+  'STATE_POP' : (state, instruction) => {
     state.state = Object.assign({}, state.stack.pop());
     updateTurtleObject(state.state);
   },
 
-  "PEN_DOWN" : (state, instruction) => {
+  'PEN_DOWN' : (state, instruction) => {
   },
 
-  "PEN_UP" : (state, instruction) => {
+  'PEN_UP' : (state, instruction) => {
   },
 
-  "PEN_COLOR" : (state, instruction) => {
+  'PEN_COLOR' : (state, instruction) => {
   },
 };
 
 function decodeInstruction(state, instruction) {
-  log.debug("decodeInstruction: " + instruction.id + " " + instruction.arg);
+  log.debug('decodeInstruction: ' + instruction.id + ' ' + instruction.arg);
 
   vmDispatchTable[instruction.id](state, instruction);
 }
@@ -147,7 +147,7 @@ function executeProgram(program) {
 function onMessageReceived(message) {
   const msg = JSON.parse(message);
   if(msg != null) {
-    log.debug("Message received:");
+    log.debug('Message received:');
     log.debug(msg);
 
     switch(msg.type) {
@@ -156,11 +156,11 @@ function onMessageReceived(message) {
         break;
     }
   } else {
-    log.error("message received didn't parse!");
+    log.error('message received didn\'t parse!');
   }
 }
 
-const init = (props) => {
+const init = () => {
   wsServer = new WebSocket.Server({ port: 8080 });
 
   if(wsServer) {
@@ -171,7 +171,7 @@ const init = (props) => {
 
   if(wsServer != null) {
     wsServer.on('connection', function connection(pClient) {
-      log.debug("new connection: " + pClient);
+      log.debug('new connection: ' + pClient);
       pClient.on('message', onMessageReceived);
     });
   }
@@ -212,9 +212,9 @@ const render = (props, children) => {
   ipcMain.removeAllListeners(IPC_CHANNEL_DEBUG);
   ipcMain.on(IPC_CHANNEL_DEBUG, (event, payload) => {
     log.debug('IPC: ', payload);
-    if (payload == "kill-ws") {
-      if(ws != null) {
-        ws.close();
+    if (payload == 'kill-ws') {
+      if(wsServer != null) {
+        wsServer.close();
       }
     }
   });
