@@ -3,22 +3,8 @@
 <head>
 </head>
 <body style="background: grey">
-  <button onclick="killWSServer()">KILL WS</button>
-  <style>
-    button {
-      width: 25vw;
-      height: 25vh;
-      color: white;
-      font-weight: bold;
-      background-color: red;
-      font-size: 72pt;
-    }
-  </style>
 </body>
 <script>
   const { ipcRenderer } = require('electron')
-  killWSServer = function() {
-    ipcRenderer.send('turtle-debug', 'kill-ws');
-  }
 </script>
 </html>

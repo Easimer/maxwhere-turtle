@@ -182,7 +182,7 @@ function onMessageReceived(message) {
   }
 }
 
-const init = () => {
+module.exports.init = () => {
   wsServer = new WebSocket.Server({ port: 8080 });
 
   if(wsServer) {
@@ -201,26 +201,13 @@ const init = () => {
   log.debug('ready');
 };
 
-const done = () => {
+module.exports.done = () => {
   log.debug('done');
 };
 
 const IPC_CHANNEL_DEBUG = 'turtle-debug';
 
-const render = (/*props, children*/) => {
-  let debugPanel = wom.create('billboard', {
-    url: path.resolve(__dirname, 'index.html'),
-    nodeIntegration: true, // need this for IPC communication
-    width: 586,
-    height: 330,
-    'resolution-width': 1600,
-    'resolution-height': 900,
-    position: { 'x': 100, 'y': 100, 'z': -10 },
-    orientation: { 'x': 0, 'y': 0, 'z': 0, 'w': -1 },
-    physical: {raycast: true} // accept mouse events to make it orbitable
-  });
-  wom.render(debugPanel);
-
+module.exports.render = (/*props, children*/) => {
   hTurtle = wom.create('mesh', {
     id: 'turtle',
     url: 'penguin.mesh',
@@ -237,18 +224,14 @@ const render = (/*props, children*/) => {
   ipcMain.removeAllListeners(IPC_CHANNEL_DEBUG);
   ipcMain.on(IPC_CHANNEL_DEBUG, (event, payload) => {
     log.debug('IPC: ', payload);
-    if (payload == 'kill-ws') {
-      if(wsServer != null) {
-        wsServer.close();
-      }
-    }
   });
   
   return <node />;
 };
 
-module.exports = {
-  init,
-  done,
-  render
+module.exports.clear = () => {
+  log.debug('clearing');
+  if(wsServer != null) {
+    wsServer.close();
+  }
 };
