@@ -13,19 +13,34 @@ let hTurtle = null;
 
 let lineSegmentContainer = null;
 
-function resetTurtle() {
+/**
+ * Resets global state. Called before every program execution.
+ */
+function resetGlobalState() {
   hTurtle.setPosition(TURTLE_INIT_POSITION, 'absolute', 'world');
   hTurtle.setOrientation(TURTLE_INIT_ORIENTATION);
 
   lineSegmentContainer.clear();
 }
 
+/**
+ * Updates the position and orientation of the turtle node.
+ * @param {Turtle} turtle Turtle node
+ */
 function updateTurtleObject(turtle) {
   const rotation = turtle.rotation;
   hTurtle.setOrientation(math.eulerToQuaternion(math.degreesToRadians(rotation)));
   hTurtle.setPosition(turtle.position);
 }
 
+/**
+ * Scales `rhs` by a constant scalar, adds it to `lhs` and returns
+ * the resulting vector.
+ * @param {vec3} lhs Left-hand side argument
+ * @param {number} scale Scalar
+ * @param {vec3} rhs Right-hand side argument; scaled by `scale`
+ * @returns lhs + scale * rhs
+ */
 function vecScaleAdd(lhs, scale, rhs) {
   return {
     x: lhs.x + scale * rhs.x,
@@ -34,6 +49,13 @@ function vecScaleAdd(lhs, scale, rhs) {
   };
 }
 
+/**
+ * Creates a line segment of a given length, at the given position
+ * with the specified orientation.
+ * @param {vec3} position Line origin
+ * @param {euler3} rotation Line orientation
+ * @param {number} length Line length
+ */
 function createLineSegment(position, rotation, length) {
   const rotationQuat = math.eulerToQuaternion(math.degreesToRadians(rotation));
   let segment = wom.create('mesh', {
@@ -145,7 +167,7 @@ function executeProgram(program) {
       pen_color: { r: 255, g: 0, b: 0 },
     }
   };
-  resetTurtle();
+  resetGlobalState();
   // Start at TOP block
   decodeInstruction(state, program);
 }
