@@ -1,9 +1,8 @@
-/* global __dirname */
 const { wom } = require('maxwhere');
 const { ipcMain  } = require('electron');
-const path = require('path');
 const WebSocket = require('ws');
 const log = require('electron-log');
+const math = require('./math');
 
 const TURTLE_INIT_POSITION = { x: 0, y: 0, z: 0 };
 const TURTLE_INIT_ORIENTATION = { w: -1, x: 0, y: 0, z: 0 };
@@ -21,32 +20,9 @@ function resetTurtle() {
   lineSegmentContainer.clear();
 }
 
-function eulerToQuaternion(yaw, pitch, roll) {
-  let cy = Math.cos(yaw * 0.5);
-  let sy = Math.sin(yaw * 0.5);
-  let cp = Math.cos(pitch * 0.5);
-  let sp = Math.sin(pitch * 0.5);
-  let cr = Math.cos(roll * 0.5);
-  let sr = Math.sin(roll * 0.5);
-
-  let w = cr * cp * cy + sr * sp * sy;
-  let x = sr * cp * cy - cr * sp * sy;
-  let y = cr * sp * cy + sr * cp * sy;
-  let z = cr * cp * sy - sr * sp * cy;
-
-  return {w: w, x: x, y: y, z: z};
-}
-
-function getTurtleDirectionVector(rotation) {
-  let dx = Math.cos(rotation.yaw) * Math.cos(rotation.pitch);
-  let dy = Math.sin(rotation.yaw) * Math.cos(rotation.pitch);
-  let dz = Math.sin(rotation.pitch);
-  return { x: dx, y: dy, z: dz };
-}
-
 function updateTurtleObject(turtle) {
   const rotation = turtle.rotation;
-  hTurtle.setOrientation(eulerToQuaternion(rotation.yaw, rotation.pitch, rotation.roll));
+  hTurtle.setOrientation(math.eulerToQuaternion(math.degreesToRadians(rotation)));
   hTurtle.setPosition(turtle.position);
 }
 
@@ -59,19 +35,19 @@ function vecScaleAdd(lhs, scale, rhs) {
 }
 
 function createLineSegment(position, rotation, length) {
-  log.debug('creating segment');
+  const rotationQuat = math.eulerToQuaternion(math.degreesToRadians(rotation));
   let segment = wom.create('mesh', {
     url: 'line.mesh',
     position: position,
-    rotation: eulerToQuaternion(rotation.yaw, rotation.pitch, rotation.roll),
-    scale: { x: length, y: 1, z: 1 }
+    scale: { x: 1, y: 1, z: length }
   });
 
-  log.debug('created segment');
   lineSegmentContainer.appendChild(segment);
-  log.debug('appended segment');
   wom.render(segment);
-  log.debug('rendered segment');
+
+  // NOTE: setting the rotation in the node property object above
+  // doesn't actually work.
+  segment.setOrientation(rotationQuat);
 }
 
 const vmDispatchTable = {
@@ -86,7 +62,7 @@ const vmDispatchTable = {
     const turtle = state.turtle;
 
     const distance = parseInt(instruction.arg);
-    let dir = getTurtleDirectionVector(turtle.rotation);
+    let dir = math.getDirectionVector(math.degreesToRadians(turtle.rotation));
     let newPos = vecScaleAdd(turtle.position, distance, dir);
     createLineSegment(turtle.position, turtle.rotation, distance);
     turtle.position = newPos;
@@ -97,19 +73,34 @@ const vmDispatchTable = {
     const turtle = state.turtle;
 
     const distance = parseInt(instruction.arg);
-    let dir = getTurtleDirectionVector(turtle.rotation);
+    let dir = math.getDirectionVector(math.degreesToRadians(turtle.rotation));
     let newPos = vecScaleAdd(turtle.position, -distance, dir);
     turtle.position = newPos;
     updateTurtleObject(turtle);
   },
 
   'ROTATE_YAW' : (state, instruction) => {
+    const turtle = state.turtle;
+    
+    let degrees = parseInt(instruction.arg);
+    turtle.rotation.yaw += degrees;
+    updateTurtleObject(turtle);
   },
 
   'ROTATE_PITCH' : (state, instruction) => {
+    const turtle = state.turtle;
+    
+    let degrees = parseInt(instruction.arg);
+    turtle.rotation.pitch += degrees;
+    updateTurtleObject(turtle);
   },
 
   'ROTATE_ROLL' : (state, instruction) => {
+    const turtle = state.turtle;
+    
+    let degrees = parseInt(instruction.arg);
+    turtle.rotation.roll += degrees;
+    updateTurtleObject(turtle);
   },
 
   'REPEAT' : (state, instruction) => {
@@ -141,8 +132,6 @@ const vmDispatchTable = {
 };
 
 function decodeInstruction(state, instruction) {
-  log.debug('decodeInstruction: ' + instruction.id + ' ' + instruction.arg);
-
   vmDispatchTable[instruction.id](state, instruction);
 }
 
