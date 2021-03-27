@@ -34,22 +34,6 @@ function updateTurtleObject(turtle) {
 }
 
 /**
- * Scales `rhs` by a constant scalar, adds it to `lhs` and returns
- * the resulting vector.
- * @param {vec3} lhs Left-hand side argument
- * @param {number} scale Scalar
- * @param {vec3} rhs Right-hand side argument; scaled by `scale`
- * @returns lhs + scale * rhs
- */
-function vecScaleAdd(lhs, scale, rhs) {
-  return {
-    x: lhs.x + scale * rhs.x,
-    y: lhs.y + scale * rhs.y,
-    z: lhs.z + scale * rhs.z,
-  };
-}
-
-/**
  * Creates a line segment of a given length, at the given position
  * with the specified orientation.
  * @param {vec3} position Line origin
@@ -84,8 +68,8 @@ const vmDispatchTable = {
     const turtle = state.turtle;
 
     const distance = parseInt(instruction.arg);
-    let dir = math.getDirectionVector(math.degreesToRadians(turtle.rotation));
-    let newPos = vecScaleAdd(turtle.position, distance, dir);
+    const dir = math.getDirectionVector(math.degreesToRadians(turtle.rotation));
+    const newPos = turtle.position.addScaled(distance, dir);
     createLineSegment(turtle.position, turtle.rotation, distance);
     turtle.position = newPos;
     updateTurtleObject(turtle);
@@ -96,7 +80,7 @@ const vmDispatchTable = {
 
     const distance = parseInt(instruction.arg);
     let dir = math.getDirectionVector(math.degreesToRadians(turtle.rotation));
-    let newPos = vecScaleAdd(turtle.position, -distance, dir);
+    const newPos = turtle.position.addScaled(-distance, dir);
     turtle.position = newPos;
     updateTurtleObject(turtle);
   },
@@ -161,7 +145,7 @@ function executeProgram(program) {
   var state = {
     stack: [],
     turtle: {
-      position: { x: 0, y: 0, z: 0 },
+      position: new math.Vec3(),
       rotation: { yaw: 0, pitch: 0, roll: 0 },
       pen_active: true,
       pen_color: { r: 255, g: 0, b: 0 },

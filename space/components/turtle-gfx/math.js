@@ -49,9 +49,38 @@ function composeQuat(l, r) {
   return { w, x, y, z };
 }
 
+class Vec3 {
+  constructor(x = 0, y = 0, z = 0) {
+    this.x = x;
+    this.y = y;
+    this.z = z;
+  }
+
+  scale(scalar) {
+    return {
+      x: scalar * this.x,
+      y: scalar * this.y,
+      z: scalar * this.z
+    };
+  }
+
+  add(other) {
+    return {
+      x: this.x + other.x,
+      y: this.y + other.y,
+      z: this.z + other.z,
+    };
+  }
+
+  addScaled(scalar, other) {
+    return this.add(other.scale(scalar));
+  }
+}
+
 module.exports = {
   degreesToRadians,
   eulerToQuaternion,
   getDirectionVector,
   composeQuat,
+  Vec3,
 };
