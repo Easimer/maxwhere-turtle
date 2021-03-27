@@ -1,6 +1,9 @@
 let elemToolbar = null;
 let elemCommandTemplate = null;
 
+let elemInputSaveAs = null;
+let elemSelectLoadName = null;
+
 const COMMAND_KIND = [
   'MOVE_FORWARD'    ,
   'MOVE_BACKWARD'   ,
@@ -142,7 +145,7 @@ function createCommand(kind, isTemplate) {
         let pattern = argumentPatterns[descriptor.argumentPatternKey];
         elemArgument.setAttribute('pattern', pattern);
         // Force validation on each input event
-        elemArgument.setAttribute('oninput', 'this.reportValidity()');
+        elemArgument.setAttribute('oninput', 'onCommandInput(event)');
       }
 
       let inputType = descriptor.inputType;
@@ -256,9 +259,143 @@ function clearProgram() {
   elemProgram.appendChild(makeCommandInsertZone());
 }
 
+function storageAvailable(type) {
+  let storage;
+  try {
+    storage = window[type];
+    const x = '__storage_test__';
+    storage.setItem(x, x);
+    storage.removeItem(x);
+    return true;
+  }
+  catch(e) {
+    return e instanceof DOMException && (
+      // everything except Firefox
+      e.code === 22 ||
+      // Firefox
+      e.code === 1014 ||
+      // test name field too, because code might not be present
+      // everything except Firefox
+      e.name === 'QuotaExceededError' ||
+      // Firefox
+      e.name === 'NS_ERROR_DOM_QUOTA_REACHED') &&
+      // acknowledge QuotaExceededError only if there's something already stored
+      (storage && storage.length !== 0);
+  }
+}
+
+function saveProgramAs(program, name) {
+  let savedPrograms = localStorage.getItem('savedPrograms');
+  if(savedPrograms == null) {
+    savedPrograms = '{}';
+  }
+
+  savedPrograms = JSON.parse(savedPrograms);
+  savedPrograms[name] = program.innerHTML;
+  savedPrograms = JSON.stringify(savedPrograms);
+  localStorage.setItem('savedPrograms', savedPrograms);
+}
+
+function saveCurrentProgram() {
+  if(!storageAvailable('localStorage')) {
+    alert('Local storage is not available.');
+    return;
+  }
+  
+  const elemProgram = document.querySelector('.program');
+
+  const name = elemInputSaveAs.value;
+  if(name === undefined || name.length == 0) {
+    alert('Program name cannot be empty!');
+    return;
+  }
+
+  saveProgramAs(elemProgram, name);
+  console.log('saved');
+  enumerateSavedPrograms();
+}
+
+function onSelectedProgram(callback) {
+  if(!storageAvailable('localStorage')) {
+    return false;
+  }
+
+  const name = elemSelectLoadName.value;
+  if(name == null || name.length == 0) {
+    return false;
+  }
+
+  let savedPrograms = localStorage.getItem('savedPrograms');
+  if(savedPrograms == null) {
+    savedPrograms = '{}';
+  }
+
+  savedPrograms = JSON.parse(savedPrograms);
+  
+  if(savedPrograms[name] === undefined) {
+    return false;
+  }
+
+  if(callback(savedPrograms, name)) {
+    savedPrograms = JSON.stringify(savedPrograms);
+    localStorage.setItem('savedPrograms', savedPrograms);
+  }
+
+  return true;
+}
+
+function loadSelectedProgram() {
+  onSelectedProgram((savedPrograms, name) => {
+    const program = savedPrograms[name];
+    const elemProgram = document.querySelector('.program');
+    elemProgram.innerHTML = program;
+    return false;
+  });
+}
+
+function deleteSelectedProgram() {
+  onSelectedProgram((savedPrograms, name) => {
+    delete savedPrograms[name];
+    return true;
+  });
+  enumerateSavedPrograms();
+}
+
+function enumerateSavedPrograms() {
+  if(!storageAvailable('localStorage')) {
+    return;
+  }
+
+  let savedPrograms = localStorage.getItem('savedPrograms');
+  if(savedPrograms == null) {
+    return;
+  }
+
+  savedPrograms = JSON.parse(savedPrograms);
+
+  while(elemSelectLoadName.firstChild != null) {
+    elemSelectLoadName.removeChild(elemSelectLoadName.firstChild);
+  }
+
+  for(let programName in savedPrograms) {
+    const elemOption = document.createElement('option');
+    elemOption.value = programName;
+    elemOption.innerText = programName;
+    elemSelectLoadName.appendChild(elemOption);
+  }
+}
+
 function handlerClearProgram() {
   clearProgram();
 }
+
+function onCommandInput(ev) {
+  ev.target.reportValidity();
+  // Create the 'value' attribute on the input field so that the value
+  // gets serialized
+  ev.target.setAttribute('value', ev.target.value);
+}
+window.onCommandInput = onCommandInput;
 
 function setupListeners() {
   document.addEventListener('drag', () => {});
@@ -274,12 +411,18 @@ function setupListeners() {
 
   document.getElementById('btnRun').addEventListener('click', handlerRunProgram);
   document.getElementById('btnClear').addEventListener('click', handlerClearProgram);
+  document.getElementById('btnSave').addEventListener('click', saveCurrentProgram);
+  document.getElementById('btnLoad').addEventListener('click', loadSelectedProgram);
+  document.getElementById('btnDelete').addEventListener('click', deleteSelectedProgram);
 }
 
 function linkUIElements() {
   // Find some important nodes in the DOM
   elemToolbar = document.getElementById('toolbar');
   elemCommandTemplate = document.getElementById('commandTemplate');
+  
+  elemInputSaveAs = document.getElementById('inputSaveAs');
+  elemSelectLoadName = document.getElementById('selectLoadName');
 }
 
 function fillToolbar() {
@@ -300,4 +443,5 @@ window.addEventListener('load', () => {
   linkUIElements();
   setupListeners();
   fillToolbar();
+  enumerateSavedPrograms();
 });
