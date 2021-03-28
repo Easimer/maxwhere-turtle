@@ -24,7 +24,7 @@ const parserNodeConverter = {
   },
 };
 
-function processSubcommands(ret, elemSubcommands, nodeConverter) {
+function processSubcommands(context, ret, elemSubcommands, nodeConverter) {
   let children = elemSubcommands.childNodes;
 
   for(let i = 0; i < children.length; i++) {
@@ -33,26 +33,60 @@ function processSubcommands(ret, elemSubcommands, nodeConverter) {
       continue;
     }
     if(child.classList.contains('baseCommand')) {
-      let result = traverseHtmlTree(child, nodeConverter);
-      ret = nodeConverter.appendResult(ret, result);
+      switch(getCommandKind(child)) {
+        case 'DEFINE_MACRO': {
+          const macroAST = traverseHtmlTree(context, child, nodeConverter);
+          const macroName = getCommandArgument(child);
+          // NOTE: we're saving the macro define command itself here
+          context.scope[macroName] = macroAST;
+          break;
+        }
+        case 'SUBSTITUTE': {
+          const macroName = getCommandArgument(child);
+          if(macroName in context.scope) {
+            for(const subcommand of context.scope[macroName].children) {
+              ret = nodeConverter.appendResult(ret, subcommand);
+            }
+          } else {
+            if(context.strictMode) {
+              throw new SyntaxError('Substituting undefined macro ' + macroName);
+            }
+          }
+          break;
+        }
+        default: {
+          let result = traverseHtmlTree(context, child, nodeConverter);
+          ret = nodeConverter.appendResult(ret, result);
+          break;
+        }
+      }
     }
   }
 
   return ret;
 }
 
-function traverseHtmlTree(tree, nodeConverter) {
+function traverseHtmlTree(context, tree, nodeConverter) {
   let ret = nodeConverter.convert(tree);
 
+  context.scopeStack.push(context.scope);
+
   let elemSubcommands = tree.querySelector('.subcommands');
-  ret = processSubcommands(ret, elemSubcommands, nodeConverter);
+  ret = processSubcommands(context, ret, elemSubcommands, nodeConverter);
+
+  context.scope = context.scopeStack.pop();
 
   return ret;
 }
 
-export function makeProgramAST(treeRoot) {
+export function makeProgramAST(treeRoot, strictMode) {
   let ret = parserNodeConverter.makeEmpty();
-  ret = processSubcommands(ret, treeRoot, parserNodeConverter);
+  const context = {
+    scopeStack: [],
+    scope: {},
+    strictMode: strictMode
+  };
+  ret = processSubcommands(context, ret, treeRoot, parserNodeConverter);
   return ret;
 }
 
@@ -60,14 +94,14 @@ export function dumpAST(ast) {
   let ret = '(' + ast.id + ', ' + ast.arg + ')';
 
   if(ast.children.length > 0) {
-    ret += '[';
+    ret += '[\n';
     for(let i = 0; i < ast.children.length; i++) {
       ret += dumpAST(ast.children[i]);
       if(i != ast.children.length - 1) {
-        ret += ', ';
+        ret += ',\n';
       }
     }
-    ret += ']';
+    ret += ']\n';
   }
 
   return ret;

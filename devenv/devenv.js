@@ -4,6 +4,8 @@ let elemCommandTemplate = null;
 let elemInputSaveAs = null;
 let elemSelectLoadName = null;
 
+const debugPrintAST = window.location.hostname == 'localhost';
+
 const COMMAND_KIND = [
   'MOVE_FORWARD'    ,
   'MOVE_BACKWARD'   ,
@@ -20,6 +22,9 @@ const COMMAND_KIND = [
   'PEN_DOWN'        ,
   'PEN_UP'          ,
   'PEN_COLOR'       ,
+
+  'DEFINE_MACRO'    ,
+  'SUBSTITUTE'      ,
 ];
 
 const argumentPatterns = {
@@ -84,6 +89,15 @@ const commandDescriptors = new Map([
     cssClass : 'cmdPen',
     inputType : 'color',
   }],
+  ['DEFINE_MACRO', {
+    label : 'Define macro',
+    cssClass : 'cmdMacro',
+    hasSubcommands : true,
+  }],
+  ['SUBSTITUTE', {
+    label : 'Substitute',
+    cssClass : 'cmdMacro',
+  }],
 ]);
 
 function insertNewCommand(commandInsertZone, kind) {
@@ -144,9 +158,9 @@ function createCommand(kind, isTemplate) {
       if(patternKey !== undefined) {
         let pattern = argumentPatterns[descriptor.argumentPatternKey];
         elemArgument.setAttribute('pattern', pattern);
-        // Force validation on each input event
-        elemArgument.setAttribute('oninput', 'onCommandInput(event)');
       }
+      // Force validation on each input event
+      elemArgument.setAttribute('oninput', 'onCommandInput(event)');
 
       let inputType = descriptor.inputType;
       if(inputType !== undefined) {
@@ -231,12 +245,16 @@ function handlerCommandBlockDrop(ev) {
   ev.preventDefault();
 }
 
-import { makeProgramAST } from './compiler.js';
+import { makeProgramAST, dumpAST } from './compiler.js';
 import { sendProgram } from './vm-client.js';
 
 function handlerRunProgram() {
   let elemProgram = document.querySelector('.program');
   let programAST = makeProgramAST(elemProgram);
+
+  if(debugPrintAST) {
+    console.log(dumpAST(programAST));
+  }
 
   const onError = () => {
     alert('Failed to connect to ws://localhost:8080!');
