@@ -38,7 +38,7 @@ function getDirectionVector(rotation) {
   let dy = -cr * cy * sp + sr * sy;
   let dz = cp * cy;
 
-  return { x: dx, y: dy, z: dz };
+  return new Vec3(dx, dy, dz);
 }
 
 function composeQuat(l, r) {
@@ -57,19 +57,11 @@ class Vec3 {
   }
 
   scale(scalar) {
-    return {
-      x: scalar * this.x,
-      y: scalar * this.y,
-      z: scalar * this.z
-    };
+    return new Vec3(scalar * this.x, scalar * this.y, scalar * this.z);
   }
 
   add(other) {
-    return {
-      x: this.x + other.x,
-      y: this.y + other.y,
-      z: this.z + other.z,
-    };
+    return new Vec3(this.x + other.x, this.y + other.y, this.z + other.z);
   }
 
   addScaled(scalar, other) {
