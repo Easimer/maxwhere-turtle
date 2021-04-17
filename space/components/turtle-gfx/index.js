@@ -39,14 +39,35 @@ function updateTurtleObject(turtle) {
  * @param {vec3} position Line origin
  * @param {euler3} rotation Line orientation
  * @param {number} length Line length
+ * @param {rgba} color Line color
  */
-function createLineSegment(position, rotation, length) {
+function createLineSegment(position, rotation, length, color) {
   const rotationQuat = math.eulerToQuaternion(math.degreesToRadians(rotation));
   let segment = wom.create('mesh', {
     url: 'line.mesh',
-    position: position,
+    position: position.toObject(),
     scale: { x: 1, y: 1, z: length }
   });
+
+  const funcSetColorOnMaterial = (segment, color, i) => {
+    try {
+      const subvisuals = segment.subvisuals();
+      subvisuals.forEach(sv => {
+        sv.material.SetDiffuse(color);
+      });
+    } catch(ex) {
+      // Mesh is not loaded yet
+      if(i < 8) {
+        setTimeout(() => {
+          funcSetColorOnMaterial(segment, color, i + 1);
+        }, 100);
+      } else {
+        log.error(`Couldn't set the color of the line segment after ${i} attempts!`);
+      }
+    }
+  };
+
+  funcSetColorOnMaterial(segment, color, 0);
 
   lineSegmentContainer.appendChild(segment);
   wom.render(segment);
@@ -54,6 +75,30 @@ function createLineSegment(position, rotation, length) {
   // NOTE: setting the rotation in the node property object above
   // doesn't actually work.
   segment.setOrientation(rotationQuat);
+}
+
+/**
+ * Decodes a hex-encoded color into an RGBA object.
+ * @param {string} Hex-encoded color, like #FF1212 or #FFF.
+ */
+function decodeHexColor(hexStr) {
+  let R, G, B;
+
+  if(hexStr.length == 4) {
+    const pattern = /^#(?<R>[a-z0-9])(?<G>[a-z0-9])(?<B>[a-z0-9])$/gi;
+    const result = pattern.exec(hexStr);
+    R = parseInt(result.groups.R + result.groups.R, 16);
+    G = parseInt(result.groups.G + result.groups.G, 16);
+    B = parseInt(result.groups.B + result.groups.B, 16);
+  } else if(hexStr.length == 7) {
+    const pattern = /^#(?<R>[a-z0-9]{2})(?<G>[a-z0-9]{2})(?<B>[a-z0-9]{2})$/gi;
+    const result = pattern.exec(hexStr);
+    R = parseInt(result.groups.R, 16);
+    G = parseInt(result.groups.G, 16);
+    B = parseInt(result.groups.B, 16);
+  }
+
+  return { r: R / 255, g: G / 255, b: B / 255, a: 1 };
 }
 
 const vmDispatchTable = {
@@ -123,11 +168,11 @@ const vmDispatchTable = {
     }
   },
 
-  'STATE_PUSH' : (state, instruction) => {
+  'STATE_PUSH' : (state) => {
     state.stack.push(Object.assign({}, state.turtle));
   },
 
-  'STATE_POP' : (state, instruction) => {
+  'STATE_POP' : (state) => {
     state.turtle = Object.assign({}, state.stack.pop());
     updateTurtleObject(state.turtle);
   },
@@ -141,6 +186,8 @@ const vmDispatchTable = {
   },
 
   'PEN_COLOR' : (state, instruction) => {
+    state.turtle.pen_color = decodeHexColor(instruction.arg);
+    log.debug(`Pen color := ${JSON.stringify(state.turtle.pen_color)}`);
   },
 };
 
@@ -155,7 +202,7 @@ function executeProgram(program) {
       position: new math.Vec3(),
       rotation: { yaw: 0, pitch: 0, roll: 0 },
       pen_active: true,
-      pen_color: { r: 255, g: 0, b: 0 },
+      pen_color: { r: 1, g: 0, b: 0, a: 1 },
     }
   };
   resetGlobalState();
