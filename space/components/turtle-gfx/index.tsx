@@ -2,18 +2,12 @@ const { wom } = require('maxwhere');
 const { ipcMain  } = require('electron');
 const ws = require('ws');
 const log = require('electron-log');
-import { math, Vec3, Euler3Deg } from './math';
+const math = require('./math');
+import { Vec3, Euler3Deg, Color } from './math';
 
 const TURTLE_INIT_POSITION = { x: 0, y: 0, z: 0 };
 const TURTLE_INIT_ORIENTATION = { w: -1, x: 0, y: 0, z: 0 };
 const TURTLE_INIT_SCALE = 1.0;
-
-interface Color {
-  r: number,
-  g: number,
-  b: number,
-  a: number,
-};
 
 interface Turtle {
   position: Vec3,
@@ -106,30 +100,6 @@ function createLineSegment(position: Vec3, rotation: Euler3Deg, length: number, 
   segment.setOrientation(rotationQuat);
 }
 
-/**
- * Decodes a hex-encoded color into an RGBA object.
- * @param {string} Hex-encoded color, like #FF1212 or #FFF.
- */
-function decodeHexColor(hexStr: string) {
-  let R, G, B;
-
-  if(hexStr.length == 4) {
-    const pattern = /^#(?<R>[a-z0-9])(?<G>[a-z0-9])(?<B>[a-z0-9])$/gi;
-    const result = pattern.exec(hexStr);
-    R = parseInt(result.groups.R + result.groups.R, 16);
-    G = parseInt(result.groups.G + result.groups.G, 16);
-    B = parseInt(result.groups.B + result.groups.B, 16);
-  } else if(hexStr.length == 7) {
-    const pattern = /^#(?<R>[a-z0-9]{2})(?<G>[a-z0-9]{2})(?<B>[a-z0-9]{2})$/gi;
-    const result = pattern.exec(hexStr);
-    R = parseInt(result.groups.R, 16);
-    G = parseInt(result.groups.G, 16);
-    B = parseInt(result.groups.B, 16);
-  }
-
-  return { r: R / 255, g: G / 255, b: B / 255, a: 1 };
-}
-
 const vmDispatchTable: DispatchTable = {
   'TOP' : (state, instruction) => {
     log.debug('processing children');
@@ -215,7 +185,7 @@ const vmDispatchTable: DispatchTable = {
   },
 
   'PEN_COLOR' : (state, instruction) => {
-    state.turtle.penColor = decodeHexColor(instruction.arg);
+    state.turtle.penColor = math.decodeHexColor(instruction.arg);
   },
 };
 

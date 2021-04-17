@@ -19,7 +19,14 @@ export interface Quat {
   z: number;
 };
 
-function degreesToRadians(rotation: Euler3Deg): Euler3Rad {
+export interface Color {
+  r: number,
+  g: number,
+  b: number,
+  a: number,
+};
+
+export function degreesToRadians(rotation: Euler3Deg): Euler3Rad {
   return {
     yaw: rotation.yaw / 180 * Math.PI,
     pitch: rotation.pitch / 180 * Math.PI,
@@ -27,7 +34,7 @@ function degreesToRadians(rotation: Euler3Deg): Euler3Rad {
   };
 }
 
-function eulerToQuaternion(rotation: Euler3Rad): Quat {
+export function eulerToQuaternion(rotation: Euler3Rad): Quat {
   let yaw = rotation.yaw;
   let pitch = rotation.pitch;
   let roll = rotation.roll;
@@ -47,7 +54,7 @@ function eulerToQuaternion(rotation: Euler3Rad): Quat {
   return { w, x, y, z };
 }
 
-function getDirectionVector(rotation: Euler3Rad): Vec3 {
+export function getDirectionVector(rotation: Euler3Rad): Vec3 {
   let cy = Math.cos(rotation.yaw);
   let sy = Math.sin(rotation.yaw);
   let cp = Math.cos(rotation.pitch);
@@ -62,7 +69,7 @@ function getDirectionVector(rotation: Euler3Rad): Vec3 {
   return new Vec3(dx, dy, dz);
 }
 
-function composeQuat(l: Quat, r: Quat): Quat {
+export function composeQuat(l: Quat, r: Quat): Quat {
   let w = l.w * r.w - l.x * r.x - l.y * r.y - l.z * r.z;
   let x = l.w * r.x + l.x * r.w + l.y * r.z - l.z * r.y;
   let y = l.w * r.y - l.x * r.z + l.y * r.w + l.z * r.x;
@@ -70,7 +77,32 @@ function composeQuat(l: Quat, r: Quat): Quat {
   return { w, x, y, z };
 }
 
-class Vec3 {
+/**
+ * Decodes a hex-encoded color into an RGBA object.
+ * @param {string} hexStr Hex-encoded color, like #FF1212 or #FFF.
+ * @returns {Color} An RGBA color.
+ */
+ export function decodeHexColor(hexStr: string): Color {
+  let R, G, B;
+
+  if(hexStr.length == 4) {
+    const pattern = /^#(?<R>[a-z0-9])(?<G>[a-z0-9])(?<B>[a-z0-9])$/gi;
+    const result = pattern.exec(hexStr);
+    R = parseInt(result.groups.R + result.groups.R, 16);
+    G = parseInt(result.groups.G + result.groups.G, 16);
+    B = parseInt(result.groups.B + result.groups.B, 16);
+  } else if(hexStr.length == 7) {
+    const pattern = /^#(?<R>[a-z0-9]{2})(?<G>[a-z0-9]{2})(?<B>[a-z0-9]{2})$/gi;
+    const result = pattern.exec(hexStr);
+    R = parseInt(result.groups.R, 16);
+    G = parseInt(result.groups.G, 16);
+    B = parseInt(result.groups.B, 16);
+  }
+
+  return { r: R / 255, g: G / 255, b: B / 255, a: 1 };
+}
+
+export class Vec3 {
   x: number;
   y: number;
   z: number;
@@ -97,11 +129,3 @@ class Vec3 {
     return { x: this.x, y: this.y, z: this.z };
   }
 }
-
-module.exports = {
-  degreesToRadians,
-  eulerToQuaternion,
-  getDirectionVector,
-  composeQuat,
-  Vec3,
-};
