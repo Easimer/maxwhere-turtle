@@ -25,12 +25,12 @@ function resetGlobalState() {
 
 /**
  * Updates the position and orientation of the turtle node.
- * @param {Turtle} turtle Turtle node
+ * @param {Turtle} turtle Turtle state
  */
 function updateTurtleObject(turtle) {
   const rotation = turtle.rotation;
   hTurtle.setOrientation(math.eulerToQuaternion(math.degreesToRadians(rotation)));
-  hTurtle.setPosition(turtle.position);
+  hTurtle.setPosition(turtle.position.toObject());
 }
 
 /**

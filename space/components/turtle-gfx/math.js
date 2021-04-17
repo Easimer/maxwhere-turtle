@@ -67,6 +67,10 @@ class Vec3 {
   addScaled(scalar, other) {
     return this.add(other.scale(scalar));
   }
+
+  toObject() {
+    return { x: this.x, y: this.y, z: this.z };
+  }
 }
 
 module.exports = {
