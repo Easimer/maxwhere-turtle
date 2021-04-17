@@ -42,8 +42,7 @@ function updateTurtleObject(turtle) {
  * @param {rgba} color Line color
  */
 function createLineSegment(position, rotation, length, color) {
-  const rotationQuat = math.eulerToQuaternion(math.degreesToRadians(rotation));
-  let segment = wom.create('mesh', {
+  const segment = wom.create('mesh', {
     url: 'line.mesh',
     position: position.toObject(),
     scale: { x: 1, y: 1, z: length }
@@ -61,8 +60,6 @@ function createLineSegment(position, rotation, length, color) {
         setTimeout(() => {
           funcSetColorOnMaterial(segment, color, i + 1);
         }, 100);
-      } else {
-        log.error(`Couldn't set the color of the line segment after ${i} attempts!`);
       }
     }
   };
@@ -74,6 +71,7 @@ function createLineSegment(position, rotation, length, color) {
 
   // NOTE: setting the rotation in the node property object above
   // doesn't actually work.
+  const rotationQuat = math.eulerToQuaternion(math.degreesToRadians(rotation));
   segment.setOrientation(rotationQuat);
 }
 
