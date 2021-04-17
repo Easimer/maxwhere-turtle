@@ -4,34 +4,11 @@ const ws = require('ws');
 const log = require('electron-log');
 const math = require('./math');
 import { Vec3, Euler3Deg, Color } from './math';
+import { Turtle, createVM, World } from './logic';
 
 const TURTLE_INIT_POSITION = { x: 0, y: 0, z: 0 };
 const TURTLE_INIT_ORIENTATION = { w: -1, x: 0, y: 0, z: 0 };
 const TURTLE_INIT_SCALE = 1.0;
-
-interface Turtle {
-  position: Vec3,
-  rotation: Euler3Deg,
-  penActive: boolean,
-  penColor: Color,
-};
-
-interface Instruction {
-  id: string,
-  arg: string,
-  children: Array<Instruction>,
-};
-
-interface VMState {
-  stack: Array<Turtle>,
-  turtle: Turtle,
-};
-
-type InstructionHandler = (state: VMState, instruction: Instruction) => void;
-
-type DispatchTable = {
-  [key: string]: InstructionHandler
-};
 
 let wsServer = null;
 let hTurtle = null;
@@ -100,112 +77,14 @@ function createLineSegment(position: Vec3, rotation: Euler3Deg, length: number, 
   segment.setOrientation(rotationQuat);
 }
 
-const vmDispatchTable: DispatchTable = {
-  'TOP' : (state, instruction) => {
-    log.debug('processing children');
-    for(const child of instruction.children) {
-      log.debug('processing child ' + child.id);
-      decodeInstruction(state, child);
-    }
-  },
-  'MOVE_FORWARD' : (state, instruction) => {
-    const turtle = state.turtle;
-
-    const distance = parseInt(instruction.arg);
-    const dir = math.getDirectionVector(math.degreesToRadians(turtle.rotation));
-    const newPos = turtle.position.addScaled(distance, dir);
-    if(turtle.penActive) {
-      createLineSegment(turtle.position, turtle.rotation, distance, turtle.penColor);
-    }
-    turtle.position = newPos;
-    updateTurtleObject(turtle);
-  },
-
-  'MOVE_BACKWARD' : (state, instruction) => {
-    const turtle = state.turtle;
-
-    const distance = parseInt(instruction.arg);
-    let dir = math.getDirectionVector(math.degreesToRadians(turtle.rotation));
-    const newPos = turtle.position.addScaled(-distance, dir);
-    if(turtle.penActive) {
-      createLineSegment(turtle.position, turtle.rotation, distance, turtle.penColor);
-    }
-    turtle.position = newPos;
-    updateTurtleObject(turtle);
-  },
-
-  'ROTATE_YAW' : (state, instruction) => {
-    const turtle = state.turtle;
-    
-    let degrees = parseInt(instruction.arg);
-    turtle.rotation.yaw += degrees;
-    updateTurtleObject(turtle);
-  },
-
-  'ROTATE_PITCH' : (state, instruction) => {
-    const turtle = state.turtle;
-    
-    let degrees = parseInt(instruction.arg);
-    turtle.rotation.pitch += degrees;
-    updateTurtleObject(turtle);
-  },
-
-  'ROTATE_ROLL' : (state, instruction) => {
-    const turtle = state.turtle;
-    
-    let degrees = parseInt(instruction.arg);
-    turtle.rotation.roll += degrees;
-    updateTurtleObject(turtle);
-  },
-
-  'REPEAT' : (state, instruction) => {
-    const times = parseInt(instruction.arg);
-    for(var i = 0; i < times; i++) {
-      for(const child of instruction.children) {
-        decodeInstruction(state, child);
-      }
-    }
-  },
-
-  'STATE_PUSH' : (state) => {
-    state.stack.push(Object.assign({}, state.turtle));
-  },
-
-  'STATE_POP' : (state) => {
-    state.turtle = Object.assign({}, state.stack.pop());
-    updateTurtleObject(state.turtle);
-  },
-
-  'PEN_DOWN' : (state) => {
-    state.turtle.penActive = true;
-  },
-
-  'PEN_UP' : (state) => {
-    state.turtle.penActive = false;
-  },
-
-  'PEN_COLOR' : (state, instruction) => {
-    state.turtle.penColor = math.decodeHexColor(instruction.arg);
-  },
-};
-
-function decodeInstruction(state: VMState, instruction: Instruction) {
-  vmDispatchTable[instruction.id](state, instruction);
-}
-
-function executeProgram(program: Instruction) {
-  var state: VMState = {
-    stack: [],
-    turtle: {
-      position: new math.Vec3(),
-      rotation: { yaw: 0, pitch: 0, roll: 0 },
-      penActive: true,
-      penColor: { r: 1, g: 0, b: 0, a: 1 },
-    }
+function executeProgram(program) {
+  const world: World = {
+    resetWorld: resetGlobalState,
+    drawLine: createLineSegment,
+    updateTurtle: updateTurtleObject,
   };
-  resetGlobalState();
-  // Start at TOP block
-  decodeInstruction(state, program);
+  const vm = createVM();
+  vm.executeProgram(program, world);
 }
 
 function onMessageReceived(message: string) {
