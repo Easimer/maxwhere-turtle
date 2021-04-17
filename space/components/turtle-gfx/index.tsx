@@ -1,12 +1,26 @@
 const { wom } = require('maxwhere');
 const { ipcMain  } = require('electron');
-const WebSocket = require('ws');
+const ws = require('ws');
 const log = require('electron-log');
 const math = require('./math');
+import { Vec3 } from './math';
 
 const TURTLE_INIT_POSITION = { x: 0, y: 0, z: 0 };
 const TURTLE_INIT_ORIENTATION = { w: -1, x: 0, y: 0, z: 0 };
 const TURTLE_INIT_SCALE = 1.0;
+
+interface Euler3 {
+  yaw: number,
+  pitch: number,
+  roll: number
+};
+
+interface Turtle {
+  position: Vec3,
+  rotation: Euler3,
+  pen_active: boolean,
+  pen_color: { r: 1, g: 0, b: 0, a: 1 },
+};
 
 let wsServer = null;
 let hTurtle = null;
@@ -27,7 +41,7 @@ function resetGlobalState() {
  * Updates the position and orientation of the turtle node.
  * @param {Turtle} turtle Turtle state
  */
-function updateTurtleObject(turtle) {
+function updateTurtleObject(turtle: Turtle) {
   const rotation = turtle.rotation;
   hTurtle.setOrientation(math.eulerToQuaternion(math.degreesToRadians(rotation)));
   hTurtle.setPosition(turtle.position.toObject());
@@ -36,12 +50,12 @@ function updateTurtleObject(turtle) {
 /**
  * Creates a line segment of a given length, at the given position
  * with the specified orientation.
- * @param {vec3} position Line origin
- * @param {euler3} rotation Line orientation
+ * @param {Vec3} position Line origin
+ * @param {Euler3} rotation Line orientation
  * @param {number} length Line length
  * @param {rgba} color Line color
  */
-function createLineSegment(position, rotation, length, color) {
+function createLineSegment(position: Vec3, rotation: Euler3, length, color) {
   const segment = wom.create('mesh', {
     url: 'line.mesh',
     position: position.toObject(),
@@ -225,7 +239,7 @@ function onMessageReceived(message) {
 }
 
 module.exports.init = () => {
-  wsServer = new WebSocket.Server({ port: 8080 });
+  wsServer = new ws.Server({ port: 8080 });
 
   if(wsServer) {
     log.debug('WS server running');
