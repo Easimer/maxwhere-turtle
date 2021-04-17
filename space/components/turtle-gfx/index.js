@@ -70,7 +70,9 @@ const vmDispatchTable = {
     const distance = parseInt(instruction.arg);
     const dir = math.getDirectionVector(math.degreesToRadians(turtle.rotation));
     const newPos = turtle.position.addScaled(distance, dir);
-    createLineSegment(turtle.position, turtle.rotation, distance);
+    if(turtle.pen_active) {
+      createLineSegment(turtle.position, turtle.rotation, distance, turtle.pen_color);
+    }
     turtle.position = newPos;
     updateTurtleObject(turtle);
   },
@@ -81,6 +83,9 @@ const vmDispatchTable = {
     const distance = parseInt(instruction.arg);
     let dir = math.getDirectionVector(math.degreesToRadians(turtle.rotation));
     const newPos = turtle.position.addScaled(-distance, dir);
+    if(turtle.pen_active) {
+      createLineSegment(turtle.position, turtle.rotation, distance, turtle.pen_color);
+    }
     turtle.position = newPos;
     updateTurtleObject(turtle);
   },
@@ -127,10 +132,12 @@ const vmDispatchTable = {
     updateTurtleObject(state.turtle);
   },
 
-  'PEN_DOWN' : (state, instruction) => {
+  'PEN_DOWN' : (state) => {
+    state.turtle.pen_active = true;
   },
 
-  'PEN_UP' : (state, instruction) => {
+  'PEN_UP' : (state) => {
+    state.turtle.pen_active = false;
   },
 
   'PEN_COLOR' : (state, instruction) => {
