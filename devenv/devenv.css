@@ -84,3 +84,16 @@ input[pattern]:invalid {
 .cmdPen {
     background-color: #F5CF7A;
 }
+
+.cmdPen input[type="color"] {
+    margin: 0;
+    padding: 0;
+    max-height: 1rem;
+}
+
+.cmdMacro {
+    background-image: url('pattern0.png');
+    background-color: #FFC9DA;
+
+    color: black;
+}
