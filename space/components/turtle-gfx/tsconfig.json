@@ -9,6 +9,6 @@
       "outDir": "."
     },
     "lib": ["es2015"],
-    "include": ["index.tsx"],
+    "include": ["*.tsx", "*.ts"],
     "exclude": [],
   }

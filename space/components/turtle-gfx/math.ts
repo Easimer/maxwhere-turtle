@@ -1,4 +1,25 @@
-function degreesToRadians(rotation) {
+export type Euler3Rad = {
+  yaw: number,
+  pitch: number,
+  roll: number,
+};
+
+export type Euler3Deg = {
+  yaw: number,
+  pitch: number,
+  roll: number,
+};
+
+export type Euler3 = Euler3Rad;
+
+export interface Quat {
+  w: number;
+  x: number;
+  y: number;
+  z: number;
+};
+
+function degreesToRadians(rotation: Euler3Deg): Euler3Rad {
   return {
     yaw: rotation.yaw / 180 * Math.PI,
     pitch: rotation.pitch / 180 * Math.PI,
@@ -6,7 +27,7 @@ function degreesToRadians(rotation) {
   };
 }
 
-function eulerToQuaternion(rotation) {
+function eulerToQuaternion(rotation: Euler3Rad): Quat {
   let yaw = rotation.yaw;
   let pitch = rotation.pitch;
   let roll = rotation.roll;
@@ -26,7 +47,7 @@ function eulerToQuaternion(rotation) {
   return { w, x, y, z };
 }
 
-function getDirectionVector(rotation) {
+function getDirectionVector(rotation: Euler3Rad): Vec3 {
   let cy = Math.cos(rotation.yaw);
   let sy = Math.sin(rotation.yaw);
   let cp = Math.cos(rotation.pitch);
@@ -41,7 +62,7 @@ function getDirectionVector(rotation) {
   return new Vec3(dx, dy, dz);
 }
 
-function composeQuat(l, r) {
+function composeQuat(l: Quat, r: Quat): Quat {
   let w = l.w * r.w - l.x * r.x - l.y * r.y - l.z * r.z;
   let x = l.w * r.x + l.x * r.w + l.y * r.z - l.z * r.y;
   let y = l.w * r.y - l.x * r.z + l.y * r.w + l.z * r.x;
@@ -50,21 +71,25 @@ function composeQuat(l, r) {
 }
 
 class Vec3 {
+  x: number;
+  y: number;
+  z: number;
+
   constructor(x = 0, y = 0, z = 0) {
     this.x = x;
     this.y = y;
     this.z = z;
   }
 
-  scale(scalar) {
+  scale(scalar: number): Vec3 {
     return new Vec3(scalar * this.x, scalar * this.y, scalar * this.z);
   }
 
-  add(other) {
+  add(other: Vec3): Vec3 {
     return new Vec3(this.x + other.x, this.y + other.y, this.z + other.z);
   }
 
-  addScaled(scalar, other) {
+  addScaled(scalar: number, other: Vec3): Vec3 {
     return this.add(other.scale(scalar));
   }
 

@@ -2,18 +2,11 @@ const { wom } = require('maxwhere');
 const { ipcMain  } = require('electron');
 const ws = require('ws');
 const log = require('electron-log');
-const math = require('./math');
-import { Vec3 } from './math';
+import { math, Vec3, Euler3Deg } from './math';
 
 const TURTLE_INIT_POSITION = { x: 0, y: 0, z: 0 };
 const TURTLE_INIT_ORIENTATION = { w: -1, x: 0, y: 0, z: 0 };
 const TURTLE_INIT_SCALE = 1.0;
-
-interface Euler3 {
-  yaw: number,
-  pitch: number,
-  roll: number,
-};
 
 interface Color {
   r: number,
@@ -24,7 +17,7 @@ interface Color {
 
 interface Turtle {
   position: Vec3,
-  rotation: Euler3,
+  rotation: Euler3Deg,
   penActive: boolean,
   penColor: Color,
 };
@@ -75,11 +68,11 @@ function updateTurtleObject(turtle: Turtle) {
  * Creates a line segment of a given length, at the given position
  * with the specified orientation.
  * @param {Vec3} position Line origin
- * @param {Euler3} rotation Line orientation
+ * @param {Euler3Deg} rotation Line orientation
  * @param {number} length Line length
  * @param {rgba} color Line color
  */
-function createLineSegment(position: Vec3, rotation: Euler3, length: number, color: Color) {
+function createLineSegment(position: Vec3, rotation: Euler3Deg, length: number, color: Color) {
   const segment = wom.create('mesh', {
     url: 'line.mesh',
     position: position.toObject(),
