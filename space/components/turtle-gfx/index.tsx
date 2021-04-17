@@ -12,14 +12,38 @@ const TURTLE_INIT_SCALE = 1.0;
 interface Euler3 {
   yaw: number,
   pitch: number,
-  roll: number
+  roll: number,
+};
+
+interface Color {
+  r: number,
+  g: number,
+  b: number,
+  a: number,
 };
 
 interface Turtle {
   position: Vec3,
   rotation: Euler3,
-  pen_active: boolean,
-  pen_color: { r: 1, g: 0, b: 0, a: 1 },
+  penActive: boolean,
+  penColor: Color,
+};
+
+interface Instruction {
+  id: string,
+  arg: string,
+  children: Array<Instruction>,
+};
+
+interface VMState {
+  stack: Array<Turtle>,
+  turtle: Turtle,
+};
+
+type InstructionHandler = (state: VMState, instruction: Instruction) => void;
+
+type DispatchTable = {
+  [key: string]: InstructionHandler
 };
 
 let wsServer = null;
@@ -55,7 +79,7 @@ function updateTurtleObject(turtle: Turtle) {
  * @param {number} length Line length
  * @param {rgba} color Line color
  */
-function createLineSegment(position: Vec3, rotation: Euler3, length, color) {
+function createLineSegment(position: Vec3, rotation: Euler3, length: number, color: Color) {
   const segment = wom.create('mesh', {
     url: 'line.mesh',
     position: position.toObject(),
@@ -93,7 +117,7 @@ function createLineSegment(position: Vec3, rotation: Euler3, length, color) {
  * Decodes a hex-encoded color into an RGBA object.
  * @param {string} Hex-encoded color, like #FF1212 or #FFF.
  */
-function decodeHexColor(hexStr) {
+function decodeHexColor(hexStr: string) {
   let R, G, B;
 
   if(hexStr.length == 4) {
@@ -113,7 +137,7 @@ function decodeHexColor(hexStr) {
   return { r: R / 255, g: G / 255, b: B / 255, a: 1 };
 }
 
-const vmDispatchTable = {
+const vmDispatchTable: DispatchTable = {
   'TOP' : (state, instruction) => {
     log.debug('processing children');
     for(const child of instruction.children) {
@@ -127,8 +151,8 @@ const vmDispatchTable = {
     const distance = parseInt(instruction.arg);
     const dir = math.getDirectionVector(math.degreesToRadians(turtle.rotation));
     const newPos = turtle.position.addScaled(distance, dir);
-    if(turtle.pen_active) {
-      createLineSegment(turtle.position, turtle.rotation, distance, turtle.pen_color);
+    if(turtle.penActive) {
+      createLineSegment(turtle.position, turtle.rotation, distance, turtle.penColor);
     }
     turtle.position = newPos;
     updateTurtleObject(turtle);
@@ -140,8 +164,8 @@ const vmDispatchTable = {
     const distance = parseInt(instruction.arg);
     let dir = math.getDirectionVector(math.degreesToRadians(turtle.rotation));
     const newPos = turtle.position.addScaled(-distance, dir);
-    if(turtle.pen_active) {
-      createLineSegment(turtle.position, turtle.rotation, distance, turtle.pen_color);
+    if(turtle.penActive) {
+      createLineSegment(turtle.position, turtle.rotation, distance, turtle.penColor);
     }
     turtle.position = newPos;
     updateTurtleObject(turtle);
@@ -190,31 +214,30 @@ const vmDispatchTable = {
   },
 
   'PEN_DOWN' : (state) => {
-    state.turtle.pen_active = true;
+    state.turtle.penActive = true;
   },
 
   'PEN_UP' : (state) => {
-    state.turtle.pen_active = false;
+    state.turtle.penActive = false;
   },
 
   'PEN_COLOR' : (state, instruction) => {
-    state.turtle.pen_color = decodeHexColor(instruction.arg);
-    log.debug(`Pen color := ${JSON.stringify(state.turtle.pen_color)}`);
+    state.turtle.penColor = decodeHexColor(instruction.arg);
   },
 };
 
-function decodeInstruction(state, instruction) {
+function decodeInstruction(state: VMState, instruction: Instruction) {
   vmDispatchTable[instruction.id](state, instruction);
 }
 
-function executeProgram(program) {
-  var state = {
+function executeProgram(program: Instruction) {
+  var state: VMState = {
     stack: [],
     turtle: {
       position: new math.Vec3(),
       rotation: { yaw: 0, pitch: 0, roll: 0 },
-      pen_active: true,
-      pen_color: { r: 1, g: 0, b: 0, a: 1 },
+      penActive: true,
+      penColor: { r: 1, g: 0, b: 0, a: 1 },
     }
   };
   resetGlobalState();
@@ -222,7 +245,7 @@ function executeProgram(program) {
   decodeInstruction(state, program);
 }
 
-function onMessageReceived(message) {
+function onMessageReceived(message: string) {
   const msg = JSON.parse(message);
   if(msg != null) {
     log.debug('Message received:');

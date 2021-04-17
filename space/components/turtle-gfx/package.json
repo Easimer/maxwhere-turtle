@@ -5,6 +5,7 @@
   "repository": "https://github.com/easimer/maxwhere-turtle",
   "main": "index.js",
   "scripts": {
+    "build": "tsc",
     "test": "mocha"
   },
   "author": "",
