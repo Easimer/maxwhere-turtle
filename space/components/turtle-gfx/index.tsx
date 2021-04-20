@@ -14,6 +14,7 @@ let wsServer = null;
 let hTurtle = null;
 
 let lineSegmentContainer = null;
+let lineSegmentCounter = 0;
 
 /**
  * Resets global state. Called before every program execution.
@@ -52,10 +53,11 @@ function createLineSegment(position: Vec3, rotation: Euler3Deg, length: number, 
 
   const funcSetColorOnMaterial = (segment, color, i) => {
     try {
-      const subvisuals = segment.subvisuals();
-      subvisuals.forEach(sv => {
-        sv.material.SetDiffuse(color);
-      });
+      const name = `mat_line${lineSegmentCounter}`;
+      const clonedMat = segment.material(segment.subvisual(0)).clone(name);
+      clonedMat.setDiffuse(color);
+      segment.setMaterial(name, 0);
+      lineSegmentCounter += 1;
     } catch(ex) {
       // Mesh is not loaded yet
       if(i < 8) {
