@@ -8,7 +8,7 @@ import { Turtle, createVM, World } from './logic';
 
 const TURTLE_INIT_POSITION = { x: 0, y: 0, z: 0 };
 const TURTLE_INIT_ORIENTATION = { w: -1, x: 0, y: 0, z: 0 };
-const TURTLE_INIT_SCALE = 1.0;
+const TURTLE_INIT_SCALE = 0.5;
 
 let wsServer = null;
 let hTurtle = null;
@@ -131,7 +131,7 @@ const IPC_CHANNEL_DEBUG = 'turtle-debug';
 module.exports.render = (/*props, children*/) => {
   hTurtle = wom.create('mesh', {
     id: 'turtle',
-    url: 'penguin.mesh',
+    url: 'turtle.mesh',
     position: TURTLE_INIT_POSITION,
     orientation: TURTLE_INIT_ORIENTATION,
     scale: TURTLE_INIT_SCALE,
