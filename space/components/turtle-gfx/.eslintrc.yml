@@ -27,3 +27,5 @@ rules:
     - always
   no-unused-vars:
     - warn
+  no-var:
+    - error

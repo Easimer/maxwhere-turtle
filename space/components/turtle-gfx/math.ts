@@ -17,14 +17,14 @@ export interface Quat {
   x: number;
   y: number;
   z: number;
-};
+}
 
 export interface Color {
   r: number,
   g: number,
   b: number,
   a: number,
-};
+}
 
 export function degreesToRadians(rotation: Euler3Deg): Euler3Rad {
   return {
@@ -82,7 +82,7 @@ export function composeQuat(l: Quat, r: Quat): Quat {
  * @param {string} hexStr Hex-encoded color, like #FF1212 or #FFF.
  * @returns {Color} An RGBA color.
  */
- export function decodeHexColor(hexStr: string): Color {
+export function decodeHexColor(hexStr: string): Color {
   let R, G, B;
 
   if(hexStr.length == 4) {

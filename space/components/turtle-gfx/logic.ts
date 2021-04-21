@@ -6,24 +6,24 @@ export interface Turtle {
   rotation: Euler3Deg,
   penActive: boolean,
   penColor: Color,
-};
+}
 
 export interface Instruction {
   id: string,
   arg: string,
   children: Array<Instruction>,
-};
+}
 
 export interface VMState {
   stack: Array<Turtle>,
   turtle: Turtle,
-};
+}
 
 export interface World {
   resetWorld: () => void;
   drawLine: (startPosition: Vec3, rotation: Euler3Deg, length: number, color: Color) => void;
   updateTurtle: (newState: Turtle) => void;
-};
+}
 
 type InstructionHandler = (world: World, state: VMState, instruction: Instruction) => void;
 
@@ -33,7 +33,7 @@ type DispatchTable = {
 
 export interface VM {
   executeProgram: (program: Instruction, world: World) => void;
-};
+}
 
 const vmDispatchTable: DispatchTable = {
   'TOP' : (world, state, instruction) => {
@@ -93,7 +93,7 @@ const vmDispatchTable: DispatchTable = {
 
   'REPEAT' : (world, state, instruction) => {
     const times = parseInt(instruction.arg);
-    for(var i = 0; i < times; i++) {
+    for(let i = 0; i < times; i++) {
       for(const child of instruction.children) {
         decodeInstruction(world, state, child);
       }
@@ -127,7 +127,7 @@ function decodeInstruction(world: World, state: VMState, instruction: Instructio
 }
 
 function executeProgram(program: Instruction, world: World) {
-  var state: VMState = {
+  const state: VMState = {
     stack: [],
     turtle: {
       position: new math.Vec3(),
