@@ -20,6 +20,7 @@ export interface VMState {
 }
 
 export interface World {
+  getInitialState: () => { position: Vec3, rotation: Euler3Deg } 
   resetWorld: () => void;
   drawLine: (startPosition: Vec3, rotation: Euler3Deg, length: number, color: Color) => void;
   updateTurtle: (newState: Turtle) => void;
@@ -127,11 +128,12 @@ function decodeInstruction(world: World, state: VMState, instruction: Instructio
 }
 
 function executeProgram(program: Instruction, world: World) {
+  const initState = world.getInitialState();
   const state: VMState = {
     stack: [],
     turtle: {
-      position: new math.Vec3(),
-      rotation: { yaw: 0, pitch: 0, roll: 0 },
+      position: initState.position,
+      rotation: initState.rotation,
       penActive: true,
       penColor: { r: 1, g: 0, b: 0, a: 1 },
     }

@@ -6,7 +6,7 @@ const math = require('./math');
 import { Vec3, Euler3Deg, Color } from './math';
 import { Turtle, createVM, World } from './logic';
 
-const TURTLE_INIT_POSITION = { x: 0, y: 0, z: 0 };
+const TURTLE_INIT_POSITION = { x: 0, y: 100, z: 0 };
 const TURTLE_INIT_ORIENTATION = { w: -1, x: 0, y: 0, z: 0 };
 const TURTLE_INIT_SCALE = 0.5;
 
@@ -79,8 +79,16 @@ function createLineSegment(position: Vec3, rotation: Euler3Deg, length: number, 
   segment.setOrientation(rotationQuat);
 }
 
+function getInitialState() {
+  return {
+    position: Vec3.fromObject(TURTLE_INIT_POSITION),
+    rotation: {yaw: 0, pitch: 0, roll: 0}
+  };
+}
+
 function executeProgram(program) {
   const world: World = {
+    getInitialState: getInitialState,
     resetWorld: resetGlobalState,
     drawLine: createLineSegment,
     updateTurtle: updateTurtleObject,

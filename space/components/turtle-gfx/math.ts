@@ -128,4 +128,8 @@ export class Vec3 {
   toObject() {
     return { x: this.x, y: this.y, z: this.z };
   }
+
+  static fromObject(object: {x: number, y: number, z: number}): Vec3 {
+    return new Vec3(object.x, object.y, object.z);
+  }
 }
