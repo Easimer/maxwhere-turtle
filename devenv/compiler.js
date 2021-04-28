@@ -85,7 +85,7 @@ function processSubcommands(context, ret, elemSubcommands, nodeConverter) {
         }
         case 'RECURSION_LIMIT': {
           const arg = parseInt(getCommandArgument(child));
-          if(context.recursionCounter === arg) {
+          if(context.recursionCounter > arg) {
             stop = true;
           }
           break;
