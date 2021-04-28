@@ -110,11 +110,17 @@ const vmDispatchTable: DispatchTable = {
   },
 
   'STATE_PUSH' : (_world, state) => {
-    state.stack.push(Object.assign({}, state.turtle));
+    const turtleCopy: Turtle = {
+      position: new Vec3(state.turtle.position.x, state.turtle.position.y, state.turtle.position.z),
+      rotation: Object.assign({}, state.turtle.rotation),
+      penActive: state.turtle.penActive,
+      penColor: Object.assign({}, state.turtle.penColor),
+    };
+    state.stack.push(turtleCopy);
   },
 
   'STATE_POP' : (world, state) => {
-    state.turtle = Object.assign({}, state.stack.pop());
+    state.turtle = state.stack.pop();
     world.updateTurtle(state.turtle);
   },
 
