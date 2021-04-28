@@ -90,18 +90,31 @@ export function makeProgramAST(treeRoot, strictMode) {
   return ret;
 }
 
-export function dumpAST(ast) {
+function repeat(times, func) {
+  for(let i = 0; i < times; i++) {
+    func();
+  }
+}
+
+export function dumpAST(ast, level) {
+  if(level === undefined) {
+    level = 0;
+  }
+
   let ret = '(' + ast.id + ', ' + ast.arg + ')';
+  repeat(level, () => { ret = '    ' + ret; });
 
   if(ast.children.length > 0) {
     ret += '[\n';
     for(let i = 0; i < ast.children.length; i++) {
-      ret += dumpAST(ast.children[i]);
+      ret += dumpAST(ast.children[i], level + 1);
       if(i != ast.children.length - 1) {
-        ret += ',\n';
+        ret += ',';
       }
+      ret += '\n';
     }
-    ret += ']\n';
+    repeat(level, () => { ret += '    '; });
+    ret += ']';
   }
 
   return ret;
