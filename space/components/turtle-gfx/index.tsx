@@ -54,7 +54,7 @@ function createLineSegment(position: Vec3, rotation: Quat, length: number, width
 
   log.debug(width);
 
-  const funcSetColorOnMaterial = (segment, color, i) => {
+  const funcSetColorOnMaterial = () => {
     try {
       const name = `mat_line${lineSegmentCounter}`;
       const clonedMat = segment.material(segment.subvisual(0)).clone(name);
@@ -63,15 +63,11 @@ function createLineSegment(position: Vec3, rotation: Quat, length: number, width
       lineSegmentCounter += 1;
     } catch(ex) {
       // Mesh is not loaded yet
-      if(i < 8) {
-        setTimeout(() => {
-          funcSetColorOnMaterial(segment, color, i + 1);
-        }, 100);
-      }
+      setTimeout(funcSetColorOnMaterial, 500);
     }
   };
 
-  funcSetColorOnMaterial(segment, color, 0);
+  funcSetColorOnMaterial();
 
   lineSegmentContainer.appendChild(segment);
   wom.render(segment);
