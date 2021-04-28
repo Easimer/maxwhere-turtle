@@ -4,7 +4,7 @@ let elemCommandTemplate = null;
 let elemInputSaveAs = null;
 let elemSelectLoadName = null;
 
-const debugPrintAST = window.location.hostname == 'localhost';
+const debugPrintAST = window.location.hostname === 'localhost';
 
 const COMMAND_KIND = [
   'MOVE_FORWARD'    ,
@@ -132,11 +132,11 @@ function removeCommand(elemCommand) {
 }
 
 function createCommand(kind, isTemplate) {
-  console.assert(elemCommandTemplate != null);
+  console.assert(elemCommandTemplate !== null);
 
   // Fetch descriptor
   let descriptor = commandDescriptors.get(kind);
-  console.assert(descriptor != null);
+  console.assert(descriptor !== null);
 
   // Clone the command template
   let template = elemCommandTemplate;
@@ -151,12 +151,12 @@ function createCommand(kind, isTemplate) {
 
   // Find the label element and set it
   let elemLabel = elemCommand.querySelector('.label');
-  if(elemLabel != null) {
+  if(elemLabel !== null) {
     elemLabel.innerHTML = descriptor.label;
   }
 
   let elemArgument = elemCommand.querySelector('.argument');
-  if(elemArgument != null) {
+  if(elemArgument !== null) {
     // Does this command have an argument?
     if(descriptor.hasArgument || descriptor.hasArgument === undefined) {
       // Set the validation pattern
@@ -221,7 +221,7 @@ function handlerDragOver(ev) {
   ev.preventDefault();
 
   let target = ev.target;
-  if(target.className == 'commandInsertZone' && !target.hasAttribute('disabled')) {
+  if(target.className === 'commandInsertZone' && !target.hasAttribute('disabled')) {
     ev.dataTransfer.dropEffect = 'copy';
   }
 }
@@ -237,7 +237,7 @@ function handlerDragDrop(ev) {
   ev.preventDefault();
 
   let target = ev.target;
-  if(target.className == 'commandInsertZone' && !target.hasAttribute('disabled')) {
+  if(target.className === 'commandInsertZone' && !target.hasAttribute('disabled')) {
     let kind = ev.dataTransfer.getData('text/plain');
     insertNewCommand(target, kind);
   }
@@ -310,7 +310,7 @@ function storageAvailable(type) {
 
 function saveProgramAs(program, name) {
   let savedPrograms = localStorage.getItem('savedPrograms');
-  if(savedPrograms == null) {
+  if(savedPrograms === null) {
     savedPrograms = '{}';
   }
 
@@ -329,7 +329,7 @@ function saveCurrentProgram() {
   const elemProgram = document.querySelector('.program');
 
   const name = elemInputSaveAs.value;
-  if(name === undefined || name.length == 0) {
+  if(name === undefined || name.length === 0) {
     alert('Program name cannot be empty!');
     return;
   }
@@ -345,12 +345,12 @@ function onSelectedProgram(callback) {
   }
 
   const name = elemSelectLoadName.value;
-  if(name == null || name.length == 0) {
+  if(name === null || name.length === 0) {
     return false;
   }
 
   let savedPrograms = localStorage.getItem('savedPrograms');
-  if(savedPrograms == null) {
+  if(savedPrograms === null) {
     savedPrograms = '{}';
   }
 
@@ -391,13 +391,13 @@ function enumerateSavedPrograms() {
   }
 
   let savedPrograms = localStorage.getItem('savedPrograms');
-  if(savedPrograms == null) {
+  if(savedPrograms === null) {
     return;
   }
 
   savedPrograms = JSON.parse(savedPrograms);
 
-  while(elemSelectLoadName.firstChild != null) {
+  while(elemSelectLoadName.firstChild !== null) {
     elemSelectLoadName.removeChild(elemSelectLoadName.firstChild);
   }
 
@@ -451,7 +451,7 @@ function linkUIElements() {
 
 function fillToolbar() {
   // Fill the command toolbar
-  console.assert(elemToolbar != null);
+  console.assert(elemToolbar !== null);
 
   for(let kind of COMMAND_KIND) {
     if(commandDescriptors.has(kind)) {
