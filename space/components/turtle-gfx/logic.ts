@@ -138,7 +138,10 @@ const vmDispatchTable: DispatchTable = {
 };
 
 function decodeInstruction(world: World, state: VMState, instruction: Instruction) {
-  vmDispatchTable[instruction.id](world, state, instruction);
+  const handler = vmDispatchTable[instruction.id];
+  if(handler !== undefined) {
+    handler(world, state, instruction);
+  }
 }
 
 function executeProgram(program: Instruction, world: World) {
