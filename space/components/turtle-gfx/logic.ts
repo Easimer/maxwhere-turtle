@@ -6,6 +6,7 @@ export interface Turtle {
   rotation: Euler3Deg,
   penActive: boolean,
   penColor: Color,
+  penWidth: number,
 }
 
 export interface Instruction {
@@ -22,7 +23,7 @@ export interface VMState {
 export interface World {
   getInitialState: () => { position: Vec3, rotation: Euler3Deg } 
   resetWorld: () => void;
-  drawLine: (startPosition: Vec3, rotation: Quat, length: number, color: Color) => void;
+  drawLine: (startPosition: Vec3, rotation: Quat, length: number, width: number, color: Color) => void;
   updateTurtle: (newState: Turtle) => void;
 }
 
@@ -56,7 +57,7 @@ const vmDispatchTable: DispatchTable = {
     const newPos = turtle.position.addScaled(distance, dir);
     if(turtle.penActive) {
       const rotation = calculateLineRotation(turtle.position, newPos);
-      world.drawLine(turtle.position, rotation, distance, turtle.penColor);
+      world.drawLine(turtle.position, rotation, distance, turtle.penWidth, turtle.penColor);
     }
     turtle.position = newPos;
     world.updateTurtle(turtle);
@@ -70,7 +71,7 @@ const vmDispatchTable: DispatchTable = {
     const newPos = turtle.position.addScaled(-distance, dir);
     if(turtle.penActive) {
       const rotation = calculateLineRotation(turtle.position, newPos);
-      world.drawLine(turtle.position, rotation, distance, turtle.penColor);
+      world.drawLine(turtle.position, rotation, distance, turtle.penWidth, turtle.penColor);
     }
     turtle.position = newPos;
     world.updateTurtle(turtle);
@@ -115,6 +116,7 @@ const vmDispatchTable: DispatchTable = {
       rotation: Object.assign({}, state.turtle.rotation),
       penActive: state.turtle.penActive,
       penColor: Object.assign({}, state.turtle.penColor),
+      penWidth: state.turtle.penWidth,
     };
     state.stack.push(turtleCopy);
   },
@@ -135,6 +137,9 @@ const vmDispatchTable: DispatchTable = {
   'PEN_COLOR' : (_world, state, instruction) => {
     state.turtle.penColor = math.decodeHexColor(instruction.arg);
   },
+  'PEN_WIDTH' : (_world, state, instruction) => {
+    state.turtle.penWidth = parseFloat(instruction.arg);
+  }
 };
 
 function decodeInstruction(world: World, state: VMState, instruction: Instruction) {
@@ -153,6 +158,7 @@ function executeProgram(program: Instruction, world: World) {
       rotation: initState.rotation,
       penActive: true,
       penColor: { r: 1, g: 0, b: 0, a: 1 },
+      penWidth: 1.0,
     }
   };
   world.resetWorld();

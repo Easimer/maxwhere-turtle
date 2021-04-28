@@ -44,13 +44,15 @@ function updateTurtleObject(turtle: Turtle) {
  * @param {number} length Line length
  * @param {rgba} color Line color
  */
-function createLineSegment(position: Vec3, rotation: Quat, length: number, color: Color) {
+function createLineSegment(position: Vec3, rotation: Quat, length: number, width: number, color: Color) {
   const segment = wom.create('mesh', {
     url: 'line.mesh',
     position: position.toObject(),
     orientation: rotation,
-    scale: { x: 1, y: 1, z: length }
+    scale: { x: width, y: width, z: length }
   });
+
+  log.debug(width);
 
   const funcSetColorOnMaterial = (segment, color, i) => {
     try {
