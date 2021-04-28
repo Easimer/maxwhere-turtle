@@ -22,6 +22,7 @@ const COMMAND_KIND = [
   'PEN_DOWN'        ,
   'PEN_UP'          ,
   'PEN_COLOR'       ,
+  'PEN_WIDTH'       ,
 
   'DEFINE_MACRO'    ,
   'SUBSTITUTE'      ,
@@ -89,6 +90,11 @@ const commandDescriptors = new Map([
     label : 'Set pen color',
     cssClass : 'cmdPen',
     inputType : 'color',
+  }],
+  ['PEN_WIDTH', {
+    argumentPatternKey : 'decimal',
+    label : 'Set pen width',
+    cssClass : 'cmdPen',
   }],
   ['DEFINE_MACRO', {
     label : 'Define macro',
