@@ -9,6 +9,11 @@ function expectVectorToBeCloseTo(actual, expected, error) {
   chai.expect(actual.z).to.be.closeTo(expected.z, error);
 }
 
+function expectQuatToBeCloseTo(actual, expected, error) {
+  chai.expect(actual.w).to.be.closeTo(expected.w, error);
+  expectVectorToBeCloseTo(actual, expected, error);
+}
+
 describe('math', () => {
   describe('degreesToRadians', () => {
     it('zero degrees', () => {
@@ -47,25 +52,31 @@ describe('math', () => {
       const input = { yaw: 0, pitch: 0, roll: 0 };
       const expected = { w: 1, x: 0, y: 0, z: 0 };
       const result = math.eulerToQuaternion(input);
-      assert.deepStrictEqual(expected, result);
+      expectQuatToBeCloseTo(expected, result, 0.001);
     });
     it('yaw 90deg is 90degs around Y-axis', () => {
       const input = { yaw: Math.PI / 2, pitch: 0, roll: 0 };
-      const expected = { w: 0.7071067811865476, x: 0, y: 0.7071067811865475, z: 0 };
+      const expected = { w: 0.7071067811865476, x: 0, y: -0.7071067811865475, z: 0 };
       const result = math.eulerToQuaternion(input);
-      assert.deepStrictEqual(expected, result);
+      expectQuatToBeCloseTo(expected, result, 0.001);
     });
-    it('pitch 90deg is 90degs around X-axis', () => {
+    it('pitch 90deg is 90degs around Z-axis', () => {
       const input = { yaw: 0, pitch: Math.PI / 2, roll: 0 };
-      const expected = { w: 0.7071067811865476, x: 0.7071067811865475, y: 0, z: 0 };
-      const result = math.eulerToQuaternion(input);
-      assert.deepStrictEqual(expected, result);
-    });
-    it('roll 90deg is 90degs around Z-axis', () => {
-      const input = { yaw: 0, pitch: 0, roll: Math.PI / 2 };
       const expected = { w: 0.7071067811865476, x: 0, y: 0, z: 0.7071067811865475 };
       const result = math.eulerToQuaternion(input);
-      assert.deepStrictEqual(expected, result);
+      expectQuatToBeCloseTo(expected, result, 0.001);
+    });
+    it('roll does nothing', () => {
+      const input = { yaw: 0, pitch: 0, roll: Math.PI / 2 };
+      const expected = { w: 1, x: 0, y: 0, z: 0 };
+      const result = math.eulerToQuaternion(input);
+      expectQuatToBeCloseTo(expected, result, 0.001);
+    });
+    it('yaw 45deg pitch 45deg', () => {
+      const input = { yaw: Math.PI / 4, pitch: Math.PI / 4, roll: 0 };
+      const expected = { w: 0.866, x: 0, y: -0.408, z: 0.288 };
+      const result = math.eulerToQuaternion(input);
+      expectQuatToBeCloseTo(expected, result, 0.001);
     });
   });
 
@@ -93,43 +104,43 @@ describe('math', () => {
   describe('getDirectionVector', () => {
     it('identity', () => {
       const input = { yaw: 0, pitch: 0, roll: 0 };
-      const expected = { x: 0, y: 0, z: 1 };
+      const expected = { x: 1, y: 0, z: 0 };
       const result = math.getDirectionVector(input);
       expectVectorToBeCloseTo(result, expected, 0.001);
     });
     it('yaw +90', () => {
       const input = { yaw: Math.PI / 2, pitch: 0, roll: 0 };
-      const expected = { x: 1, y: 0, z: 0 };
+      const expected = { x: 0, y: 0, z: 1 };
       const result = math.getDirectionVector(input);
       expectVectorToBeCloseTo(result, expected, 0.001);
     });
     it('yaw +180', () => {
       const input = { yaw: Math.PI, pitch: 0, roll: 0 };
-      const expected = { x: 0, y: 0, z: -1 };
+      const expected = { x: -1, y: 0, z: 0 };
       const result = math.getDirectionVector(input);
       expectVectorToBeCloseTo(result, expected, 0.001);
     });
     it('pitch +90', () => {
       const input = { yaw: 0, pitch: Math.PI / 2, roll: 0 };
-      const expected = { x: 0, y: -1, z: 0 };
+      const expected = { x: 0, y: 1, z: 0 };
       const result = math.getDirectionVector(input);
       expectVectorToBeCloseTo(result, expected, 0.001);
     });
     it('pitch +180', () => {
       const input = { yaw: 0, pitch: Math.PI, roll: 0 };
-      const expected = { x: 0, y: 0, z: -1 };
+      const expected = { x: -1, y: 0, z: 0 };
       const result = math.getDirectionVector(input);
       expectVectorToBeCloseTo(result, expected, 0.001);
     });
-    it('pitch +90', () => {
+    it('pitch +270', () => {
       const input = { yaw: 0, pitch: 3 * Math.PI / 2, roll: 0 };
-      const expected = { x: 0, y: 1, z: 0 };
+      const expected = { x: 0, y: -1, z: 0 };
       const result = math.getDirectionVector(input);
       expectVectorToBeCloseTo(result, expected, 0.001);
     });
     it('roll does nothing', () => {
       const input = { yaw: 0, pitch: 0, roll: 3 * Math.PI / 2 };
-      const expected = { x: 0, y: 0, z: 1 };
+      const expected = { x: 1, y: 0, z: 0 };
       const result = math.getDirectionVector(input);
       expectVectorToBeCloseTo(result, expected, 0.001);
     });

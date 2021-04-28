@@ -1,4 +1,4 @@
-import { Vec3, Euler3Deg, Color } from './math';
+import { Vec3, Euler3Deg, Color, Quat } from './math';
 import * as math from './math';
 
 export interface Turtle {
@@ -22,7 +22,7 @@ export interface VMState {
 export interface World {
   getInitialState: () => { position: Vec3, rotation: Euler3Deg } 
   resetWorld: () => void;
-  drawLine: (startPosition: Vec3, rotation: Euler3Deg, length: number, color: Color) => void;
+  drawLine: (startPosition: Vec3, rotation: Quat, length: number, color: Color) => void;
   updateTurtle: (newState: Turtle) => void;
 }
 
@@ -34,6 +34,12 @@ type DispatchTable = {
 
 export interface VM {
   executeProgram: (program: Instruction, world: World) => void;
+}
+
+function calculateLineRotation(oldPos: Vec3, newPos: Vec3): Quat {
+  const vecSource = new Vec3(0, 0, 1);
+  const vecTarget = newPos.subtract(oldPos).normalized();
+  return math.quaternionFromVectorTo(vecSource, vecTarget);
 }
 
 const vmDispatchTable: DispatchTable = {
@@ -49,7 +55,8 @@ const vmDispatchTable: DispatchTable = {
     const dir = math.getDirectionVector(math.degreesToRadians(turtle.rotation));
     const newPos = turtle.position.addScaled(distance, dir);
     if(turtle.penActive) {
-      world.drawLine(turtle.position, turtle.rotation, distance, turtle.penColor);
+      const rotation = calculateLineRotation(turtle.position, newPos);
+      world.drawLine(turtle.position, rotation, distance, turtle.penColor);
     }
     turtle.position = newPos;
     world.updateTurtle(turtle);
@@ -62,7 +69,8 @@ const vmDispatchTable: DispatchTable = {
     let dir = math.getDirectionVector(math.degreesToRadians(turtle.rotation));
     const newPos = turtle.position.addScaled(-distance, dir);
     if(turtle.penActive) {
-      world.drawLine(turtle.position, turtle.rotation, distance, turtle.penColor);
+      const rotation = calculateLineRotation(turtle.position, newPos);
+      world.drawLine(turtle.position, rotation, distance, turtle.penColor);
     }
     turtle.position = newPos;
     world.updateTurtle(turtle);

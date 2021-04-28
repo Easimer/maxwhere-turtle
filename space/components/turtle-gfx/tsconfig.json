@@ -6,9 +6,10 @@
       "moduleResolution": "node",
       "sourceMap": true,
       "jsx": "preserve",
-      "outDir": "."
+      "outDir": ".",
+      "mapRoot": "."
     },
     "lib": ["es2015"],
     "include": ["*.tsx", "*.ts"],
-    "exclude": [],
+    "exclude": ["node_modules"],
   }

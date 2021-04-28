@@ -15,10 +15,10 @@ q_z * q_y * q_x
 from sympy.matrices import Matrix
 
 My = Matrix([[cy, 0, sy], [0, 1, 0], [sy, 0, cy]])
-Mp = Matrix([[1, 0, 0], [0, cp, -sp], [0, sp, cp]])
-Mr = Matrix([[cr, -sr, 0], [sr, cr, 0], [0, 0, 1]])
+Mr = Matrix([[1, 0, 0], [0, cr, -sr], [0, sr, cr]])
+Mp = Matrix([[cp, -sp, 0], [sp, cp, 0], [0, 0, 1]])
 
-X = Matrix(3, 1, [0, 0, 1])
+X = Matrix(3, 1, [1, 0, 0])
 
-print("Euler to direction vector:")
+print("Yaw-Pitch-Roll to direction vector:")
 print(Mr * Mp * My * X)

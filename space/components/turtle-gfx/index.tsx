@@ -3,11 +3,11 @@ const { ipcMain  } = require('electron');
 const ws = require('ws');
 const log = require('electron-log');
 const math = require('./math');
-import { Vec3, Euler3Deg, Color } from './math';
+import { Vec3, Quat, Color, eulerToQuaternion } from './math';
 import { Turtle, createVM, World } from './logic';
 
 const TURTLE_INIT_POSITION = { x: 0, y: 100, z: 0 };
-const TURTLE_INIT_ORIENTATION = { w: -1, x: 0, y: 0, z: 0 };
+const TURTLE_INIT_ORIENTATION = { w: 1, x: 0, y: 0, z: 0 };
 const TURTLE_INIT_SCALE = 0.5;
 
 let wsServer = null;
@@ -44,10 +44,11 @@ function updateTurtleObject(turtle: Turtle) {
  * @param {number} length Line length
  * @param {rgba} color Line color
  */
-function createLineSegment(position: Vec3, rotation: Euler3Deg, length: number, color: Color) {
+function createLineSegment(position: Vec3, rotation: Quat, length: number, color: Color) {
   const segment = wom.create('mesh', {
     url: 'line.mesh',
     position: position.toObject(),
+    orientation: rotation,
     scale: { x: 1, y: 1, z: length }
   });
 
@@ -72,11 +73,6 @@ function createLineSegment(position: Vec3, rotation: Euler3Deg, length: number, 
 
   lineSegmentContainer.appendChild(segment);
   wom.render(segment);
-
-  // NOTE: setting the rotation in the node property object above
-  // doesn't actually work.
-  const rotationQuat = math.eulerToQuaternion(math.degreesToRadians(rotation));
-  segment.setOrientation(rotationQuat);
 }
 
 function getInitialState() {
@@ -156,7 +152,7 @@ module.exports.render = (/*props, children*/) => {
   ipcMain.on(IPC_CHANNEL_DEBUG, (event, payload) => {
     log.debug('IPC: ', payload);
   });
-  
+
   return <node />;
 };
 

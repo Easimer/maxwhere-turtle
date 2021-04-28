@@ -34,24 +34,46 @@ export function degreesToRadians(rotation: Euler3Deg): Euler3Rad {
   };
 }
 
+function normalize(q: Quat): Quat {
+  const norm = Math.sqrt(q.w * q.w + q.x * q.x + q.y * q.y + q.z * q.z);
+
+  return {
+    w: q.w / norm,
+    x: q.x / norm,
+    y: q.y / norm,
+    z: q.z / norm
+  };
+}
+
+export function quaternionFromVectorTo(vecSource: Vec3, vecTarget: Vec3): Quat {
+  const d = dot(vecSource, vecTarget);
+
+  if(d >= 0.999) {
+    return { w: 1, x: 0, y: 0, z: 0 };
+  }
+
+  if(d <= -0.999) {
+    return { w: 0, x: 0, y: 1, z: 0 };
+  }
+  
+  const axis = cross(vecSource, vecTarget);
+  const w = d + Math.sqrt(vecSource.lengthSq() * vecTarget.lengthSq());
+
+  const Q = {
+    w: w,
+    x: axis.x,
+    y: axis.y,
+    z: axis.z
+  };
+
+  return normalize(Q);
+}
+
 export function eulerToQuaternion(rotation: Euler3Rad): Quat {
-  let yaw = rotation.yaw;
-  let pitch = rotation.pitch;
-  let roll = rotation.roll;
+  const vecTarget = getDirectionVector(rotation);
+  const vecSource = new Vec3(1, 0, 0);
 
-  let cy = Math.cos(yaw * 0.5);
-  let sy = Math.sin(yaw * 0.5);
-  let cp = Math.cos(pitch * 0.5);
-  let sp = Math.sin(pitch * 0.5);
-  let cr = Math.cos(roll * 0.5);
-  let sr = Math.sin(roll * 0.5);
-
-  let w = cp * cr * cy + sp * sr * sy;
-  let x = -cp * sr * sy + cr * cy * sp;
-  let y = cp * cr * sy + cy * sp * sr;
-  let z = cp * cy * sr - cr * sp * sy;
-
-  return { w, x, y, z };
+  return quaternionFromVectorTo(vecSource, vecTarget);
 }
 
 export function getDirectionVector(rotation: Euler3Rad): Vec3 {
@@ -62,9 +84,9 @@ export function getDirectionVector(rotation: Euler3Rad): Vec3 {
   let cr = Math.cos(rotation.roll);
   let sr = Math.sin(rotation.roll);
 
-  let dx = cr * sy + cy * sp * sr;
-  let dy = -cr * cy * sp + sr * sy;
-  let dz = cp * cy;
+  let dx = cp * cy;
+  let dy = cr*cy*sp - sr*sy;
+  let dz = cr*sy + cy*sp*sr;
 
   return new Vec3(dx, dy, dz);
 }
@@ -102,6 +124,18 @@ export function decodeHexColor(hexStr: string): Color {
   return { r: R / 255, g: G / 255, b: B / 255, a: 1 };
 }
 
+function dot(lhs: Vec3, rhs: Vec3): number {
+  return lhs.x * rhs.x + lhs.y * rhs.y + lhs.z * rhs.z;
+}
+
+function cross(lhs: Vec3, rhs: Vec3): Vec3 {
+  return new Vec3(
+    lhs.y * rhs.z - lhs.z * rhs.y,
+    lhs.z * rhs.x - lhs.x * rhs.z,
+    lhs.x * rhs.y - lhs.y * rhs.x
+  );
+}
+
 export class Vec3 {
   x: number;
   y: number;
@@ -121,12 +155,25 @@ export class Vec3 {
     return new Vec3(this.x + other.x, this.y + other.y, this.z + other.z);
   }
 
+  subtract(other: Vec3): Vec3 {
+    return new Vec3(this.x - other.x, this.y - other.y, this.z - other.z);
+  }
+
   addScaled(scalar: number, other: Vec3): Vec3 {
     return this.add(other.scale(scalar));
   }
 
   toObject() {
     return { x: this.x, y: this.y, z: this.z };
+  }
+
+  lengthSq() : number {
+    return dot(this, this);
+  }
+
+  normalized() : Vec3 {
+    const norm = Math.sqrt(this.lengthSq());
+    return this.scale(1 / norm);
   }
 
   static fromObject(object: {x: number, y: number, z: number}): Vec3 {
