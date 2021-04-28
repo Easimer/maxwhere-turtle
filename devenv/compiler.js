@@ -54,8 +54,9 @@ function printWarning(context, msg) {
 
 function processSubcommands(context, ret, elemSubcommands, nodeConverter) {
   let children = elemSubcommands.childNodes;
+  let stop = false;
 
-  for(let i = 0; i < children.length; i++) {
+  for(let i = 0; i < children.length && !stop; i++) {
     let child = children[i];
     if(child.classList === undefined) {
       continue;
@@ -71,12 +72,21 @@ function processSubcommands(context, ret, elemSubcommands, nodeConverter) {
         case 'SUBSTITUTE': {
           const macroName = getCommandArgument(child);
           if(macroName in context.scope) {
+            context.recursionCounter += 1;
             const substitutedAST = traverseHtmlTree(context, context.scope[macroName], nodeConverter);
+            context.recursionCounter -= 1;
             for(const subcommand of substitutedAST.children) {
               ret = nodeConverter.appendResult(ret, subcommand);
             }
           } else {
             printWarning(context, `Substituting undefined macro '${macroName}'`);
+          }
+          break;
+        }
+        case 'RECURSION_LIMIT': {
+          const arg = parseInt(getCommandArgument(child));
+          if(context.recursionCounter === arg) {
+            stop = true;
           }
           break;
         }
@@ -116,6 +126,7 @@ export function makeProgramAST(treeRoot, strictMode) {
     strictMode: strictMode,
     numWarnings: 0,
     numErrors: 0,
+    recursionCounter: 0,
   };
   ret = processSubcommands(context, ret, treeRoot, parserNodeConverter);
 
