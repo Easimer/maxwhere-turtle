@@ -24,6 +24,34 @@ const parserNodeConverter = {
   },
 };
 
+function makeStackTrace(context) {
+  let ret = '';
+
+  for(let i = 0; i < context.stackTrace.length; i++) {
+    const kind = getCommandKind(context.stackTrace[i]);
+    const arg = getCommandArgument(context.stackTrace[i]);
+    ret += `${i+1}: ${kind}(${arg})\n`;
+  }
+
+  return ret;
+}
+
+function printWarning(context, msg) {
+  const stackTrace = makeStackTrace(context);
+  if(context.strictMode) {
+    context.numErrors += 1;
+    throw {
+      message: msg,
+      stackTrace: stackTrace,
+    };
+  } else {
+    context.numWarnings += 1;
+    if(console !== undefined && console !== null) {
+      console.warn(`${msg}\nStacktrace:\n${stackTrace}`);
+    }
+  }
+}
+
 function processSubcommands(context, ret, elemSubcommands, nodeConverter) {
   let children = elemSubcommands.childNodes;
 
@@ -48,9 +76,7 @@ function processSubcommands(context, ret, elemSubcommands, nodeConverter) {
               ret = nodeConverter.appendResult(ret, subcommand);
             }
           } else {
-            if(context.strictMode) {
-              throw new SyntaxError('Substituting undefined macro ' + macroName);
-            }
+            printWarning(context, `Substituting undefined macro '${macroName}'`);
           }
           break;
         }
@@ -70,10 +96,12 @@ function traverseHtmlTree(context, tree, nodeConverter) {
   let ret = nodeConverter.convert(tree);
 
   context.scopeStack.push(context.scope);
+  context.stackTrace.push(tree);
 
   let elemSubcommands = tree.querySelector('.subcommands');
   ret = processSubcommands(context, ret, elemSubcommands, nodeConverter);
 
+  context.stackTrace.pop();
   context.scope = context.scopeStack.pop();
 
   return ret;
@@ -84,9 +112,17 @@ export function makeProgramAST(treeRoot, strictMode) {
   const context = {
     scopeStack: [],
     scope: {},
-    strictMode: strictMode
+    stackTrace: [],
+    strictMode: strictMode,
+    numWarnings: 0,
+    numErrors: 0,
   };
   ret = processSubcommands(context, ret, treeRoot, parserNodeConverter);
+
+  if(context.numWarnings > 0 || context.numErrors > 0) {
+    console.warn(`Compilation resulted in ${context.numWarnings} warnings and ${context.numErrors} errors!`);
+  }
+
   return ret;
 }
 
