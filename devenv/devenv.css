@@ -2,11 +2,20 @@ html, body {
     background-color: white;
 }
 
-#toolbar {
+.sticky {
+    position: sticky;
+    top: 0;
+}
+
+.non-transparent {
+    background-color: white;
+}
+
+.toolbar {
     border: 1px solid black;
 }
 
-#control {
+.control {
     border: 1px solid red;
     padding: 0.25em;
 }
