@@ -35,16 +35,16 @@ function processSubcommands(context, ret, elemSubcommands, nodeConverter) {
     if(child.classList.contains('baseCommand')) {
       switch(getCommandKind(child)) {
         case 'DEFINE_MACRO': {
-          const macroAST = traverseHtmlTree(context, child, nodeConverter);
           const macroName = getCommandArgument(child);
           // NOTE: we're saving the macro define command itself here
-          context.scope[macroName] = macroAST;
+          context.scope[macroName] = child;
           break;
         }
         case 'SUBSTITUTE': {
           const macroName = getCommandArgument(child);
           if(macroName in context.scope) {
-            for(const subcommand of context.scope[macroName].children) {
+            const substitutedAST = traverseHtmlTree(context, context.scope[macroName], nodeConverter);
+            for(const subcommand of substitutedAST.children) {
               ret = nodeConverter.appendResult(ret, subcommand);
             }
           } else {

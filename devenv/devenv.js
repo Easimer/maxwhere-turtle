@@ -250,7 +250,7 @@ import { sendProgram } from './vm-client.js';
 
 function handlerRunProgram() {
   let elemProgram = document.querySelector('.program');
-  let programAST = makeProgramAST(elemProgram);
+  let programAST = makeProgramAST(elemProgram, true);
 
   if(debugPrintAST) {
     console.log(dumpAST(programAST));
