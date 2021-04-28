@@ -25,10 +25,11 @@ const COMMAND_KIND = [
 
   'DEFINE_MACRO'    ,
   'SUBSTITUTE'      ,
+  'RECURSION_LIMIT' ,
 ];
 
 const argumentPatterns = {
-  'decimal' : '^\\d*\\.?\\d+$',
+  'decimal' : '^[+-]?\\d*\\.?\\d+$',
   'integer' : '^\\d+$',
 };
 
@@ -97,6 +98,11 @@ const commandDescriptors = new Map([
   ['SUBSTITUTE', {
     label : 'Substitute',
     cssClass : 'cmdMacro',
+  }],
+  ['RECURSION_LIMIT', {
+    label : 'Recursion limit',
+    cssClass : 'cmdLimit',
+    argumentPatternKey : 'integer',
   }],
 ]);
 

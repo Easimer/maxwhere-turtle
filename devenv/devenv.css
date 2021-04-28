@@ -59,7 +59,7 @@ input[pattern]:invalid {
 }
 
 .baseCommand > .argument {
-    max-width: 4em;
+    max-width: 6em;
 }
 
 .commandInsertZone {
@@ -103,6 +103,9 @@ input[pattern]:invalid {
 .cmdMacro {
     background-image: url('pattern0.png');
     background-color: #FFC9DA;
+}
 
-    color: black;
+.cmdLimit {
+    background-image: url('pattern1.png');
+    background-color: rgb(87, 87, 87, 0.3);
 }
