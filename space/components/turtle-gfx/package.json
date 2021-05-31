@@ -11,7 +11,7 @@
   "author": "",
   "license": "GPL-3.0-or-later",
   "dependencies": {
-    "ws": "^7.4.4",
+    "ws": "^7.4.6",
     "electron-log": "^4.3.2"
   },
   "devDependencies": {
