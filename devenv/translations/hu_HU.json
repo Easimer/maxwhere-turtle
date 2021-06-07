@@ -1,0 +1,26 @@
+{
+    "ACTION_RUN": "Futtatás",
+    "ACTION_CLEAR": "Törlés",
+    "ACTION_SAVE": "Mentés",
+    "ACTION_LOAD": "Betöltés",
+    "ACTION_DELETE": "Törlés",
+
+    "COMMAND_MOVE_FORWARD": "Előre",
+    "COMMAND_MOVE_BACKWARD": "Hátra",
+    "COMMAND_ROTATE_YAW": "Oldalirányú forgás (Yaw)",
+    "COMMAND_ROTATE_PITCH": "Hosszdőlés (Pitch)",
+    "COMMAND_ROTATE_ROLL": "Forgás (Roll)",
+    "COMMAND_REPEAT": "Ismétlés",
+    "COMMAND_STATE_PUSH": "Állapot mentése",
+    "COMMAND_STATE_POP": "Állapot visszaállítása",
+    "COMMAND_PEN_DOWN": "Tollat le",
+    "COMMAND_PEN_UP": "Tollat fel",
+    "COMMAND_PEN_COLOR": "Toll szín",
+    "COMMAND_PEN_WIDTH": "Toll vastagság",
+    "COMMAND_DEFINE_MACRO": "Makró definíció",
+    "COMMAND_SUBSTITUTE": "Behelyettesít",
+    "COMMAND_RECURSION_LIMIT": "Rekurzió limiter",
+
+    "ERROR_EMPTY_PROGRAM_NAME": "A program neve nem lehet üres!",
+    "ERROR_LOCAL_STORAGE_UNAVAILABLE": "A helyi tárolási funkciók nem elérhetők!"
+}

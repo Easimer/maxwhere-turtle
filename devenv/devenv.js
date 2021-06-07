@@ -1,3 +1,5 @@
+import localization from './localization.js';
+
 let elemToolbar = null;
 let elemCommandTemplate = null;
 
@@ -37,80 +39,84 @@ const argumentPatterns = {
 const commandDescriptors = new Map([
   ['MOVE_FORWARD', {
     argumentPatternKey : 'decimal',
-    label : 'Move forward',
+    label : 'COMMAND_MOVE_FORWARD',
     cssClass : 'cmdMove',
   }],
   ['MOVE_BACKWARD', {
     argumentPatternKey : 'decimal',
-    label : 'Move backward',
+    label : 'COMMAND_MOVE_BACKWARD',
     cssClass : 'cmdMove',
   }],
   ['ROTATE_YAW', {
     argumentPatternKey : 'decimal',
-    label : 'Rotate yaw',
+    label : 'COMMAND_ROTATE_YAW',
     cssClass : 'cmdRotate',
   }],
   ['ROTATE_PITCH', {
     argumentPatternKey : 'decimal',
-    label : 'Rotate pitch',
+    label : 'COMMAND_ROTATE_PITCH',
     cssClass : 'cmdRotate',
   }],
   ['ROTATE_ROLL', {
     argumentPatternKey : 'decimal',
-    label : 'Rotate roll',
+    label : 'COMMAND_ROTATE_ROLL',
     cssClass : 'cmdRotate',
   }],
   ['REPEAT', {
     argumentPatternKey : 'integer',
-    label : 'Repeat N times',
+    label : 'COMMAND_REPEAT',
     hasSubcommands : true,
     cssClass : 'cmdControl',
   }],
   ['STATE_PUSH', {
     hasArgument : false,
-    label : 'Save state',
+    label : 'COMMAND_STATE_PUSH',
     cssClass : 'cmdStack',
   }],
   ['STATE_POP', {
     hasArgument : false,
-    label : 'Restore state',
+    label : 'COMMAND_STATE_POP',
     cssClass : 'cmdStack',
   }],
   ['PEN_DOWN', {
     hasArgument : false,
-    label : 'Pen down',
+    label : 'COMMAND_PEN_DOWN',
     cssClass : 'cmdPen',
   }],
   ['PEN_UP', {
     hasArgument : false,
-    label : 'Pen up',
+    label : 'COMMAND_PEN_UP',
     cssClass : 'cmdPen',
   }],
   ['PEN_COLOR', {
-    label : 'Set pen color',
+    label : 'COMMAND_PEN_COLOR',
     cssClass : 'cmdPen',
     inputType : 'color',
   }],
   ['PEN_WIDTH', {
     argumentPatternKey : 'decimal',
-    label : 'Set pen width',
+    label : 'COMMAND_PEN_WIDTH',
     cssClass : 'cmdPen',
   }],
   ['DEFINE_MACRO', {
-    label : 'Define macro',
+    label : 'COMMAND_DEFINE_MACRO',
     cssClass : 'cmdMacro',
     hasSubcommands : true,
   }],
   ['SUBSTITUTE', {
-    label : 'Substitute',
+    label : 'COMMAND_SUBSTITUTE',
     cssClass : 'cmdMacro',
   }],
   ['RECURSION_LIMIT', {
-    label : 'Recursion limit',
+    label : 'COMMAND_RECURSION_LIMIT',
     cssClass : 'cmdLimit',
     argumentPatternKey : 'integer',
   }],
 ]);
+
+function $L(token) {
+  return localization.lookupString(token);
+}
 
 function insertNewCommand(commandInsertZone, kind) {
   let elemCmd = createCommand(kind, false);
@@ -158,7 +164,7 @@ function createCommand(kind, isTemplate) {
   // Find the label element and set it
   let elemLabel = elemCommand.querySelector('.label');
   if(elemLabel !== null) {
-    elemLabel.innerHTML = descriptor.label;
+    elemLabel.innerHTML = $L(descriptor.label);
   }
 
   let elemArgument = elemCommand.querySelector('.argument');
@@ -328,7 +334,7 @@ function saveProgramAs(program, name) {
 
 function saveCurrentProgram() {
   if(!storageAvailable('localStorage')) {
-    alert('Local storage is not available.');
+    alert($L('ERROR_LOCAL_STORAGE_UNAVAILABLE'));
     return;
   }
   
@@ -336,7 +342,7 @@ function saveCurrentProgram() {
 
   const name = elemInputSaveAs.value;
   if(name === undefined || name.length === 0) {
-    alert('Program name cannot be empty!');
+    alert($L('ERROR_EMPTY_PROGRAM_NAME'));
     return;
   }
 
@@ -446,6 +452,12 @@ function setupListeners() {
   document.getElementById('btnDelete').addEventListener('click', deleteSelectedProgram);
 }
 
+function localizeControlBarButtons() {
+  document.getElementById('control')
+    .querySelectorAll('button')
+    .forEach(btn => btn.innerText = $L(btn.innerText));
+}
+
 function linkUIElements() {
   // Find some important nodes in the DOM
   elemToolbar = document.getElementById('toolbar');
@@ -470,8 +482,12 @@ function fillToolbar() {
 }
 
 window.addEventListener('load', () => {
-  linkUIElements();
+  localization.init()
+  .then(() => {
+    linkUIElements();
+    localizeControlBarButtons();
+    fillToolbar();
+  });
   setupListeners();
-  fillToolbar();
   enumerateSavedPrograms();
 });

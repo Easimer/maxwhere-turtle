@@ -1,0 +1,26 @@
+{
+    "ACTION_RUN": "Run",
+    "ACTION_CLEAR": "Clear",
+    "ACTION_SAVE": "Save",
+    "ACTION_LOAD": "Load",
+    "ACTION_DELETE": "Delete",
+
+    "COMMAND_MOVE_FORWARD": "Move forward",
+    "COMMAND_MOVE_BACKWARD": "Move backward",
+    "COMMAND_ROTATE_YAW": "Rotate yaw",
+    "COMMAND_ROTATE_PITCH": "Rotate pitch",
+    "COMMAND_ROTATE_ROLL": "Rotate roll",
+    "COMMAND_REPEAT": "Repeat N times",
+    "COMMAND_STATE_PUSH": "Save state",
+    "COMMAND_STATE_POP": "Restore state",
+    "COMMAND_PEN_DOWN": "Pen down",
+    "COMMAND_PEN_UP": "Pen up",
+    "COMMAND_PEN_COLOR": "Set pen color",
+    "COMMAND_PEN_WIDTH": "Set pen width",
+    "COMMAND_DEFINE_MACRO": "Define macro",
+    "COMMAND_SUBSTITUTE": "Substitute",
+    "COMMAND_RECURSION_LIMIT": "Recursion limit",
+
+    "ERROR_EMPTY_PROGRAM_NAME": "Program name cannot be empty!",
+    "ERROR_LOCAL_STORAGE_UNAVAILABLE": "Local storage is unavailable!"
+}
