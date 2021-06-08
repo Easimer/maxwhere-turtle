@@ -1,8 +1,9 @@
 const { wom } = require('maxwhere');
 const { ipcMain  } = require('electron');
-const ws = require('ws');
+import ws from 'ws';
 const log = require('electron-log');
 const math = require('./math');
+const pkg = require('./package.json');
 import { Vec3, Quat, Color, eulerToQuaternion } from './math';
 import { Turtle, createVM, World } from './logic';
 
@@ -91,7 +92,15 @@ function executeProgram(program) {
   vm.executeProgram(program, world);
 }
 
-function onMessageReceived(message: string) {
+function pong(client: WebSocket): void {
+  const response = {
+    'type': 'pong',
+    'version': pkg.version
+  };
+  client.send(JSON.stringify(response));
+}
+
+function onMessageReceived(client: WebSocket, message: string): void {
   const msg = JSON.parse(message);
   if(msg != null) {
     log.debug('Message received:');
@@ -101,10 +110,15 @@ function onMessageReceived(message: string) {
       case 'execProgram':
         executeProgram(msg.program);
         break;
+      case 'ping':
+        pong(client);
+        break;
     }
   } else {
     log.error('message received didn\'t parse!');
   }
+
+  client.close();
 }
 
 module.exports.init = () => {
@@ -117,9 +131,11 @@ module.exports.init = () => {
   }
 
   if(wsServer != null) {
-    wsServer.on('connection', function connection(pClient) {
-      log.debug('new connection: ' + pClient);
-      pClient.on('message', onMessageReceived);
+    wsServer.on('connection', (client: WebSocket) => {
+      log.debug('new connection: ' + client);
+      client.onmessage = (message: MessageEvent) => {
+        onMessageReceived(client, message.data);
+      };
     });
   }
 

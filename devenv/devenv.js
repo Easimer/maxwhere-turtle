@@ -1,7 +1,10 @@
 import localization from './localization.js';
+import { makeProgramAST, dumpAST } from './compiler.js';
+import vmClient from './vm-client.js';
 
 let elemToolbar = null;
 let elemCommandTemplate = null;
+let elemConnectionIndicator = null;
 
 let elemInputSaveAs = null;
 let elemSelectLoadName = null;
@@ -263,9 +266,6 @@ function handlerCommandBlockDrop(ev) {
   ev.preventDefault();
 }
 
-import { makeProgramAST, dumpAST } from './compiler.js';
-import { sendProgram } from './vm-client.js';
-
 function handlerRunProgram() {
   let elemProgram = document.querySelector('.program');
   let programAST = makeProgramAST(elemProgram);
@@ -282,7 +282,7 @@ function handlerRunProgram() {
     console.log('Sent program!');
   };
 
-  sendProgram('ws://localhost:8080', programAST, onSuccess, onError);
+  vmClient.sendProgram('ws://localhost:8080', programAST, onSuccess, onError);
 }
 
 function clearProgram() {
@@ -465,6 +465,24 @@ function linkUIElements() {
   
   elemInputSaveAs = document.getElementById('inputSaveAs');
   elemSelectLoadName = document.getElementById('selectLoadName');
+
+  elemConnectionIndicator = document.getElementById('connectionIndicator');
+}
+
+function beginPinging() {
+  const pinger = () => {
+    vmClient.sendPing('ws://localhost:8080',
+      message => {
+        elemConnectionIndicator.innerText = `${$L('CONN_ONLINE')} (${message.version})`;
+        setTimeout(pinger, 3000);
+      },
+      () => {
+        elemConnectionIndicator.innerText = $L('CONN_OFFLINE');
+        setTimeout(pinger, 1000);
+      });
+  };
+
+  pinger();
 }
 
 function fillToolbar() {
@@ -488,6 +506,7 @@ window.addEventListener('load', () => {
       localizeControlBarButtons();
       fillToolbar();
       enumerateSavedPrograms();
+      beginPinging();
     });
   setupListeners();
 });

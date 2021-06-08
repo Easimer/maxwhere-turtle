@@ -22,5 +22,8 @@
     "COMMAND_RECURSION_LIMIT": "Rekurzió limiter",
 
     "ERROR_EMPTY_PROGRAM_NAME": "A program neve nem lehet üres!",
-    "ERROR_LOCAL_STORAGE_UNAVAILABLE": "A helyi tárolási funkciók nem elérhetők!"
+    "ERROR_LOCAL_STORAGE_UNAVAILABLE": "A helyi tárolási funkciók nem elérhetők!",
+
+    "CONN_ONLINE": "Kapcsolódva",
+    "CONN_OFFLINE": "Offline"
 }

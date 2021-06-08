@@ -22,5 +22,8 @@
     "COMMAND_RECURSION_LIMIT": "Recursion limit",
 
     "ERROR_EMPTY_PROGRAM_NAME": "Program name cannot be empty!",
-    "ERROR_LOCAL_STORAGE_UNAVAILABLE": "Local storage is unavailable!"
+    "ERROR_LOCAL_STORAGE_UNAVAILABLE": "Local storage is unavailable!",
+
+    "CONN_ONLINE": "Connected",
+    "CONN_OFFLINE": "Offline"
 }
