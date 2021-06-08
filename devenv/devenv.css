@@ -1,5 +1,8 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans&display=swap');
+
 html, body {
     background-color: white;
+    font-family: 'Open Sans', sans-serif;
 }
 
 .sticky {
@@ -33,7 +36,6 @@ html, body {
     min-height: 1.5em;
     display: inline-block;
 
-    font-family: sans-serif;
     text-align: left;
 }
 
