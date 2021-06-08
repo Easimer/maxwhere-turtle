@@ -455,7 +455,7 @@ function setupListeners() {
 function localizeControlBarButtons() {
   document.getElementById('control')
     .querySelectorAll('button')
-    .forEach(btn => btn.innerText = $L(btn.innerText));
+    .forEach(btn => btn.innerHTML = $L(btn.innerText));
 }
 
 function linkUIElements() {
@@ -473,11 +473,11 @@ function beginPinging() {
   const pinger = () => {
     vmClient.sendPing('ws://localhost:8080',
       message => {
-        elemConnectionIndicator.innerText = `${$L('CONN_ONLINE')} (${message.version})`;
+        elemConnectionIndicator.innerHTML = `${$L('CONN_ONLINE')} (${message.version})`;
         setTimeout(pinger, 3000);
       },
       () => {
-        elemConnectionIndicator.innerText = $L('CONN_OFFLINE');
+        elemConnectionIndicator.innerHTML = $L('CONN_OFFLINE');
         setTimeout(pinger, 1000);
       });
   };
