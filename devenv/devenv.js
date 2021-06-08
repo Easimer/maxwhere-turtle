@@ -483,11 +483,11 @@ function fillToolbar() {
 
 window.addEventListener('load', () => {
   localization.init()
-  .then(() => {
-    linkUIElements();
-    localizeControlBarButtons();
-    fillToolbar();
-  });
+    .then(() => {
+      linkUIElements();
+      localizeControlBarButtons();
+      fillToolbar();
+      enumerateSavedPrograms();
+    });
   setupListeners();
-  enumerateSavedPrograms();
 });
