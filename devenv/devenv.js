@@ -502,9 +502,8 @@ function setupListeners() {
   document.getElementById('btnStep').addEventListener('click', singleStep);
 }
 
-function localizeControlBarButtons() {
-  document.getElementById('control')
-    .querySelectorAll('button')
+function localizeElements() {
+  document.querySelectorAll('._localize')
     .forEach(btn => btn.innerHTML = $L(btn.innerText));
 }
 
@@ -555,7 +554,7 @@ window.addEventListener('load', () => {
   localization.init()
     .then(() => {
       linkUIElements();
-      localizeControlBarButtons();
+      localizeElements();
       fillToolbar();
       enumerateSavedPrograms();
       beginPinging();

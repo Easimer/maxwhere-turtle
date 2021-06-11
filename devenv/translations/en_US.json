@@ -1,9 +1,12 @@
 {
+    "DEVENV_TITLE": "maxwhere-turtle devenv",
     "ACTION_RUN": "Run",
     "ACTION_CLEAR": "Clear",
     "ACTION_SAVE": "Save",
     "ACTION_LOAD": "Load",
     "ACTION_DELETE": "Delete",
+    "ACTION_RUN_SINGLE_STEP": "Begin single stepping",
+    "ACTION_STEP": "Step",
 
     "COMMAND_MOVE_FORWARD": "Move forward",
     "COMMAND_MOVE_BACKWARD": "Move backward",
@@ -23,6 +26,13 @@
 
     "ERROR_EMPTY_PROGRAM_NAME": "Program name cannot be empty!",
     "ERROR_LOCAL_STORAGE_UNAVAILABLE": "Local storage is unavailable!",
+
+    "TURTLE_WATCH_WINDOW_TITLE": "Turtle Watch",
+    "TURTLE_WATCH_POSITION": "Position",
+    "TURTLE_WATCH_ROTATION": "Rotation",
+    "TURTLE_WATCH_PENACTIVE": "Is pen active",
+    "TURTLE_WATCH_PENCOLOR": "Pen color",
+    "TURTLE_WATCH_PENWIDTH": "Pen width",
 
     "CONN_ONLINE": "Connected",
     "CONN_OFFLINE": "Offline"

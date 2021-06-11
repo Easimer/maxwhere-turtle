@@ -1,9 +1,12 @@
 {
+    "DEVENV_TITLE": "maxwhere-turtle Programszerkesztő",
     "ACTION_RUN": "Futtatás",
     "ACTION_CLEAR": "Törlés",
     "ACTION_SAVE": "Mentés",
     "ACTION_LOAD": "Betöltés",
     "ACTION_DELETE": "Törlés",
+    "ACTION_RUN_SINGLE_STEP": "Single step megkezdése",
+    "ACTION_STEP": "Lépés",
 
     "COMMAND_MOVE_FORWARD": "Előre",
     "COMMAND_MOVE_BACKWARD": "Hátra",
@@ -23,6 +26,13 @@
 
     "ERROR_EMPTY_PROGRAM_NAME": "A program neve nem lehet üres!",
     "ERROR_LOCAL_STORAGE_UNAVAILABLE": "A helyi tárolási funkciók nem elérhetők!",
+
+    "TURTLE_WATCH_WINDOW_TITLE": "Teknősfigyelő",
+    "TURTLE_WATCH_POSITION": "Pozíció",
+    "TURTLE_WATCH_ROTATION": "Elfordulás",
+    "TURTLE_WATCH_PENACTIVE": "Aktív a toll",
+    "TURTLE_WATCH_PENCOLOR": "Tollszín",
+    "TURTLE_WATCH_PENWIDTH": "Tollvastagság",
 
     "CONN_ONLINE": "Kapcsolódva",
     "CONN_OFFLINE": "Offline"
