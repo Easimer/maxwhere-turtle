@@ -211,6 +211,7 @@ export class CSingleStepVM implements ISingleStepVM {
     };
     this.program = program;
     this.iterator = null;
+    world.resetWorld();
   }
 
   step(world: World): [Turtle, Instruction | void] {

@@ -5,6 +5,7 @@ import vmClient from './vm-client.js';
 let elemToolbar = null;
 let elemCommandTemplate = null;
 let elemConnectionIndicator = null;
+let elemTurtleWatch = null;
 
 let elemInputSaveAs = null;
 let elemSelectLoadName = null;
@@ -438,15 +439,31 @@ function beginSingleStep() {
   };
 
   const onSuccess = () => {
-    console.log('Single stepping session has begun');
   };
 
   vmClient.beginSingleStep('ws://localhost:8080', programAST, onSuccess, onError);
 }
 
+function hideTurtleWatch() {
+  elemTurtleWatch.classList.add('watchWindowHidden');
+}
+
+function updateTurtleWatch(turtle) {
+  elemTurtleWatch.classList.remove('watchWindowHidden');
+  const elemContents = elemTurtleWatch.querySelector('.watchWindowContents');
+  elemContents.innerHTML = '';
+
+  for(const key in turtle) {
+    const localizationKey = `TURTLE_WATCH_${key.toUpperCase()}`;
+    elemContents.innerHTML += `<pre>${$L(localizationKey)}: ${JSON.stringify(turtle[key])}</pre>`;
+  }
+
+  elemTurtleWatch.querySelector('.watchWindowCloseButton').addEventListener('click', hideTurtleWatch);
+}
+
 function singleStep() {
   const onSuccess = (report) => {
-    console.log(report);
+    updateTurtleWatch(report.turtle);
   };
 
   const onError = (kind) => {
@@ -500,6 +517,8 @@ function linkUIElements() {
   elemSelectLoadName = document.getElementById('selectLoadName');
 
   elemConnectionIndicator = document.getElementById('connectionIndicator');
+
+  elemTurtleWatch = document.getElementById('turtleWatchWindow');
 }
 
 function beginPinging() {

@@ -76,6 +76,33 @@ input[pattern]:invalid {
     font-weight: bold;
 }
 
+.watchWindow {
+    background-color: #5B6678;
+    border: 1px solid #303640;
+
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    min-width: 50vw;
+
+    transition: left 0.25s ease-in;
+}
+
+.watchWindowHidden {
+    left: -100%;
+}
+
+.watchWindowTitleBar {
+    display: inline-block;
+    background-color: #303640;
+    color: #AEC3E5;
+    width: 100%;
+}
+
+.watchWindowContents {
+    padding: 0.5em;
+}
+
 .cmdMove {
     background-color: #6CEBEA;
 }
