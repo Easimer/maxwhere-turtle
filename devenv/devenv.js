@@ -425,6 +425,37 @@ function handlerClearProgram() {
   clearProgram();
 }
 
+function beginSingleStep() {
+  const elemProgram = document.querySelector('.program');
+  const programAST = makeProgramAST(elemProgram);
+
+  if(debugPrintAST) {
+    console.log(dumpAST(programAST));
+  }
+
+  const onError = () => {
+    alert('Failed to connect to ws://localhost:8080!');
+  };
+
+  const onSuccess = () => {
+    console.log('Single stepping session has begun');
+  };
+
+  vmClient.beginSingleStep('ws://localhost:8080', programAST, onSuccess, onError);
+}
+
+function singleStep() {
+  const onSuccess = (report) => {
+    console.log(report);
+  };
+
+  const onError = (kind) => {
+    console.log(kind);
+  };
+
+  vmClient.step('ws://localhost:8080', onSuccess, onError);
+}
+
 function onCommandInput(ev) {
   ev.target.reportValidity();
   // Create the 'value' attribute on the input field so that the value
@@ -450,6 +481,8 @@ function setupListeners() {
   document.getElementById('btnSave').addEventListener('click', saveCurrentProgram);
   document.getElementById('btnLoad').addEventListener('click', loadSelectedProgram);
   document.getElementById('btnDelete').addEventListener('click', deleteSelectedProgram);
+  document.getElementById('btnBeginSingleStep').addEventListener('click', beginSingleStep);
+  document.getElementById('btnStep').addEventListener('click', singleStep);
 }
 
 function localizeControlBarButtons() {
