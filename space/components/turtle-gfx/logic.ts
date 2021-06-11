@@ -37,6 +37,10 @@ export interface VM {
   executeProgram: (program: Instruction, world: World) => void;
 }
 
+export interface ISingleStepVM {
+  step: (world: World) => [Turtle, Instruction | void];
+}
+
 function calculateLineRotation(oldPos: Vec3, newPos: Vec3): Quat {
   const vecSource = new Vec3(0, 0, 1);
   const vecTarget = newPos.subtract(oldPos).normalized();
@@ -149,6 +153,32 @@ function decodeInstruction(world: World, state: VMState, instruction: Instructio
   }
 }
 
+function* traverseProgramTree(instruction: Instruction): Generator<Instruction, null, unknown> {
+  if (instruction.children.length !== 0) {
+    switch(instruction.id) {
+      case 'TOP': {
+        for (const child of instruction.children) {
+          yield * traverseProgramTree(child);
+        }
+        break;
+      }
+      case 'REPEAT': {
+        const times = parseInt(instruction.arg);
+        for (let i = 0; i < times; i++) {
+          for (const child of instruction.children) {
+            yield * traverseProgramTree(child);
+          }
+        }
+        break;
+      }
+    }
+  } else {
+    yield instruction;
+  }
+
+  return null;
+}
+
 function executeProgram(program: Instruction, world: World) {
   const initState = world.getInitialState();
   const state: VMState = {
@@ -164,6 +194,40 @@ function executeProgram(program: Instruction, world: World) {
   world.resetWorld();
   // Start at TOP block
   decodeInstruction(world, state, program);
+}
+
+export class CSingleStepVM implements ISingleStepVM {
+  constructor(world: World, program: Instruction) {
+    const initState = world.getInitialState();
+    this.state = {
+      stack: [],
+      turtle: {
+        position: initState.position,
+        rotation: initState.rotation,
+        penActive: true,
+        penColor: { r: 1, g: 0, b: 0, a: 1 },
+        penWidth: 1.0,
+      }
+    };
+    this.program = program;
+    this.iterator = null;
+  }
+
+  step(world: World): [Turtle, Instruction | void] {
+    if (this.iterator === null) {
+      this.iterator = traverseProgramTree(this.program);
+    }
+
+    const currentInstruction = this.iterator.next().value;
+    if(currentInstruction !== null) {
+      decodeInstruction(world, this.state, currentInstruction as Instruction);
+    }
+    return [this.state.turtle, currentInstruction];
+  }
+
+  private state: VMState;
+  private program: Instruction;
+  private iterator: Generator<Instruction, void, unknown>;
 }
 
 export function createVM(): VM {

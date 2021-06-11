@@ -5,7 +5,7 @@ const log = require('electron-log');
 const math = require('./math');
 const pkg = require('./package.json');
 import { Vec3, Quat, Color, eulerToQuaternion } from './math';
-import { Turtle, createVM, World } from './logic';
+import { Turtle, createVM, World, CSingleStepVM, ISingleStepVM } from './logic';
 
 const TURTLE_INIT_POSITION = { x: 0, y: 100, z: 0 };
 const TURTLE_INIT_ORIENTATION = { w: 1, x: 0, y: 0, z: 0 };
@@ -13,6 +13,8 @@ const TURTLE_INIT_SCALE = 0.5;
 
 let wsServer = null;
 let hTurtle = null;
+
+let singleStepSession: ISingleStepVM = null;
 
 let lineSegmentContainer = null;
 let lineSegmentCounter = 0;
@@ -82,6 +84,8 @@ function getInitialState() {
 }
 
 function executeProgram(program) {
+  singleStepSession = null;
+
   const world: World = {
     getInitialState: getInitialState,
     resetWorld: resetGlobalState,
@@ -92,12 +96,59 @@ function executeProgram(program) {
   vm.executeProgram(program, world);
 }
 
-function pong(client: WebSocket): void {
+function sendSimpleResponse(client: WebSocket, type: string) {
   const response = {
-    'type': 'pong',
-    'version': pkg.version
+    'type': type
   };
   client.send(JSON.stringify(response));
+}
+
+function sendResponse(client: WebSocket, type: string, payloadKey: string, payload: any) {
+  const response = {
+    'type': type,
+  };
+  response[payloadKey] = payload;
+
+  client.send(JSON.stringify(response));
+}
+
+function pong(client: WebSocket): void {
+  sendResponse(client, 'pong', 'version', pkg.version);
+}
+
+function beginSingleStep(client: WebSocket, program) {
+  const world: World = {
+    getInitialState: getInitialState,
+    resetWorld: resetGlobalState,
+    drawLine: createLineSegment,
+    updateTurtle: updateTurtleObject,
+  };
+
+  singleStepSession = new CSingleStepVM(world, program);
+  sendSimpleResponse(client, 'vmStarted');
+}
+
+function singleStep(client: WebSocket) {
+  if (singleStepSession === null) {
+    sendSimpleResponse(client, 'vmDied');
+    return;
+  }
+
+  const world: World = {
+    getInitialState: getInitialState,
+    resetWorld: resetGlobalState,
+    drawLine: createLineSegment,
+    updateTurtle: updateTurtleObject,
+  };
+
+  const [turtle, instruction] = singleStepSession.step(world);
+
+  const report = {
+    ended: (instruction === null),
+    turtle: turtle
+  };
+
+  sendResponse(client, 'vmReport', 'report', report);
 }
 
 function onMessageReceived(client: WebSocket, message: string): void {
@@ -109,6 +160,12 @@ function onMessageReceived(client: WebSocket, message: string): void {
     switch(msg.type) {
       case 'execProgram':
         executeProgram(msg.program);
+        break;
+      case 'beginSingleStep':
+        beginSingleStep(client, msg.program);
+        break;
+      case 'step':
+        singleStep(client);
         break;
       case 'ping':
         pong(client);
