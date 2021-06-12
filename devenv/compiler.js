@@ -12,11 +12,12 @@ function getCommandArgument(node) {
 }
 
 const parserNodeConverter = {
+  nextUid: 0,
   makeEmpty : function() {
-    return { id: 'TOP', arg: '', children: [], node: null };
+    return { id: 'TOP', arg: '', children: [], node: null, uid: this.nextUid++ };
   },
   convert : function(root) {
-    return { id: getCommandKind(root), arg: getCommandArgument(root), children: [], node: root };
+    return { id: getCommandKind(root), arg: getCommandArgument(root), children: [], node: root, uid: this.nextUid++ };
   },
   appendResult : function(accumulator, result) {
     accumulator.children.push(result);
@@ -239,6 +240,7 @@ function mapOptimizationEfficiencyToColor(e) {
 }
 
 export function makeProgramAST(treeRoot, strictMode) {
+  parserNodeConverter.nextUid = 0;
   let ret = parserNodeConverter.makeEmpty();
   const context = {
     scopeStack: [],
@@ -269,6 +271,8 @@ export function makeProgramAST(treeRoot, strictMode) {
   if(context.numWarnings > 0 || context.numErrors > 0) {
     console.warn(`Compilation resulted in ${context.numWarnings} warnings and ${context.numErrors} errors!`);
   }
+
+  console.log("ret", ret);
 
   return ret;
 }
