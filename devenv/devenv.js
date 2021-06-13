@@ -10,6 +10,9 @@ let elemTurtleWatch = null;
 let elemInputSaveAs = null;
 let elemSelectLoadName = null;
 
+let singleSteppingProgramAST = null;
+let singleSteppingProgramASTCursor = null;
+
 const debugPrintAST = window.location.hostname === 'localhost';
 
 const COMMAND_KIND = [
@@ -429,6 +432,7 @@ function handlerClearProgram() {
 function beginSingleStep() {
   const elemProgram = document.querySelector('.program');
   const programAST = makeProgramAST(elemProgram);
+  singleSteppingProgramAST = programAST;
 
   if(debugPrintAST) {
     console.log(dumpAST(programAST));
@@ -461,12 +465,63 @@ function updateTurtleWatch(turtle) {
   elemTurtleWatch.querySelector('.watchWindowCloseButton').addEventListener('click', hideTurtleWatch);
 }
 
+function clearCommandHighlighting() {
+  if(singleSteppingProgramASTCursor !== null) {
+    singleSteppingProgramASTCursor.node.classList.remove('stepThruCurrentCommand');
+  }
+
+  singleSteppingProgramAST = null;
+  singleSteppingProgramASTCursor = null;
+}
+
+function highlightCommand(uid) {
+  console.assert(singleSteppingProgramAST !== null);
+
+  const queue = [singleSteppingProgramAST];
+  console.debug('highlight begin', uid);
+
+  if(singleSteppingProgramASTCursor !== null) {
+    singleSteppingProgramASTCursor.node.classList.remove('stepThruCurrentCommand');
+    singleSteppingProgramASTCursor = null;
+  }
+
+  do {
+    let current = queue.shift();
+    if (current.uid < uid) {
+      for (const child of current.children) {
+        queue.push(child);
+      }
+    } else if (current.uid === uid) {
+      singleSteppingProgramASTCursor = current;
+      console.debug('highlight found', uid, current);
+      current.node.classList.add('stepThruCurrentCommand');
+      return;
+    }
+  } while (queue.length > 0);
+  console.debug('highlight uid not found', uid);
+}
+
 function singleStep() {
   const onSuccess = (report) => {
+    if(report.ended) {
+      clearCommandHighlighting();
+      return;
+    }
+
     updateTurtleWatch(report.turtle);
+    console.debug(report);
+    if(report.uid !== undefined) {
+      highlightCommand(report.uid);
+    } else {
+      console.debug('no uid?');
+    }
   };
 
   const onError = (kind) => {
+    if(kind === 'vmDied') {
+      clearCommandHighlighting();
+    }
+
     console.log(kind);
   };
 

@@ -103,6 +103,23 @@ input[pattern]:invalid {
     padding: 0.5em;
 }
 
+.stepThruCurrentCommand {
+    border: 1px solid rgba(255, 0, 0, 1);
+    animation: 1s linear stepThruCurrentCommandAnim infinite;
+}
+
+@keyframes stepThruCurrentCommandAnim {
+    from {
+        box-shadow: 0 0 0px 0px rgba(255, 0, 0, .0);
+    }
+    75% {
+        box-shadow: 0 0 4px 4px rgba(255, 0, 0, .5);
+    }
+    to {
+        box-shadow: 0 0 0px 0px rgba(255, 0, 0, .0);
+    }
+}
+
 .cmdMove {
     background-color: #6CEBEA;
 }
