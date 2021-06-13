@@ -1,6 +1,6 @@
 {
   "name": "turtle-gfx",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Turtle graphics VM server",
   "repository": "https://github.com/easimer/maxwhere-turtle",
   "main": "index.js",
