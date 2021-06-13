@@ -7,6 +7,8 @@
     "ACTION_DELETE": "Delete",
     "ACTION_RUN_SINGLE_STEP": "Begin single stepping",
     "ACTION_STEP": "Step",
+    "ACTION_AUTO_STEP": "Toggle auto-step",
+    "ACTION_AUTO_STEP_INTERVAL": "Speed",
 
     "COMMAND_MOVE_FORWARD": "Move forward",
     "COMMAND_MOVE_BACKWARD": "Move backward",

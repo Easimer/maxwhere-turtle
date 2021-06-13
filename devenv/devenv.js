@@ -6,12 +6,14 @@ let elemToolbar = null;
 let elemCommandTemplate = null;
 let elemConnectionIndicator = null;
 let elemTurtleWatch = null;
+let elemAutostepInterval = null;
 
 let elemInputSaveAs = null;
 let elemSelectLoadName = null;
 
 let singleSteppingProgramAST = null;
 let singleSteppingProgramASTCursor = null;
+let singleSteppingAutostepIntervalId = null;
 
 const debugPrintAST = window.location.hostname === 'localhost';
 
@@ -466,7 +468,7 @@ function updateTurtleWatch(turtle) {
 }
 
 function clearCommandHighlighting() {
-  if(singleSteppingProgramASTCursor !== null) {
+  if(singleSteppingProgramASTCursor !== null && singleSteppingProgramASTCursor.node !== null) {
     singleSteppingProgramASTCursor.node.classList.remove('stepThruCurrentCommand');
   }
 
@@ -478,7 +480,6 @@ function highlightCommand(uid) {
   console.assert(singleSteppingProgramAST !== null);
 
   const queue = [singleSteppingProgramAST];
-  console.debug('highlight begin', uid);
 
   if(singleSteppingProgramASTCursor !== null) {
     singleSteppingProgramASTCursor.node.classList.remove('stepThruCurrentCommand');
@@ -493,12 +494,12 @@ function highlightCommand(uid) {
       }
     } else if (current.uid === uid) {
       singleSteppingProgramASTCursor = current;
-      console.debug('highlight found', uid, current);
-      current.node.classList.add('stepThruCurrentCommand');
+      if(current.node !== null) {
+        current.node.classList.add('stepThruCurrentCommand');
+      }
       return;
     }
   } while (queue.length > 0);
-  console.debug('highlight uid not found', uid);
 }
 
 function singleStep() {
@@ -512,8 +513,6 @@ function singleStep() {
     console.debug(report);
     if(report.uid !== undefined) {
       highlightCommand(report.uid);
-    } else {
-      console.debug('no uid?');
     }
   };
 
@@ -526,6 +525,26 @@ function singleStep() {
   };
 
   vmClient.step('ws://localhost:8080', onSuccess, onError);
+}
+
+function toggleAutostep(newState) {
+  if(singleSteppingAutostepIntervalId === null) {
+    if(newState) {
+      singleSteppingAutostepIntervalId = setInterval(singleStep, elemAutostepInterval.value);
+    }
+  } else {
+    if(!newState) {
+      clearInterval(singleSteppingAutostepIntervalId);
+      singleSteppingAutostepIntervalId = null;
+    }
+  }
+}
+
+function setAutostepInterval(intervalMs) {
+  if(singleSteppingAutostepIntervalId !== null) {
+    clearInterval(singleSteppingAutostepIntervalId);
+    singleSteppingAutostepIntervalId = setInterval(() => singleStep, intervalMs);
+  }
 }
 
 function onCommandInput(ev) {
@@ -555,6 +574,8 @@ function setupListeners() {
   document.getElementById('btnDelete').addEventListener('click', deleteSelectedProgram);
   document.getElementById('btnBeginSingleStep').addEventListener('click', beginSingleStep);
   document.getElementById('btnStep').addEventListener('click', singleStep);
+  document.getElementById('chkAutostep').addEventListener('change', (ev) => toggleAutostep(ev.target.checked));
+  elemAutostepInterval.addEventListener('change', (ev) => setAutostepInterval(ev.target.value));
 }
 
 function localizeElements() {
@@ -573,6 +594,7 @@ function linkUIElements() {
   elemConnectionIndicator = document.getElementById('connectionIndicator');
 
   elemTurtleWatch = document.getElementById('turtleWatchWindow');
+  elemAutostepInterval = document.getElementById('rangeAutostepSpeed');
 }
 
 function beginPinging() {
@@ -609,10 +631,10 @@ window.addEventListener('load', () => {
   localization.init()
     .then(() => {
       linkUIElements();
+      setupListeners();
       localizeElements();
       fillToolbar();
       enumerateSavedPrograms();
       beginPinging();
     });
-  setupListeners();
 });

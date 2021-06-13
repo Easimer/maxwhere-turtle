@@ -7,6 +7,8 @@
     "ACTION_DELETE": "Törlés",
     "ACTION_RUN_SINGLE_STEP": "Single step megkezdése",
     "ACTION_STEP": "Lépés",
+    "ACTION_AUTO_STEP": "Automatikus léptetés",
+    "ACTION_AUTO_STEP_INTERVAL": "Sebesség",
 
     "COMMAND_MOVE_FORWARD": "Előre",
     "COMMAND_MOVE_BACKWARD": "Hátra",
