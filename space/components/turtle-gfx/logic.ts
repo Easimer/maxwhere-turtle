@@ -13,6 +13,7 @@ export interface Instruction {
   id: string,
   arg: string,
   children: Array<Instruction>,
+  uid: number,
 }
 
 export interface VMState {

@@ -5,7 +5,7 @@ const log = require('electron-log');
 const math = require('./math');
 const pkg = require('./package.json');
 import { Vec3, Quat, Color, eulerToQuaternion } from './math';
-import { Turtle, createVM, World, CSingleStepVM, ISingleStepVM } from './logic';
+import { Turtle, createVM, World, CSingleStepVM, ISingleStepVM, Instruction } from './logic';
 
 const TURTLE_INIT_POSITION = { x: 0, y: 100, z: 0 };
 const TURTLE_INIT_ORIENTATION = { w: 1, x: 0, y: 0, z: 0 };
@@ -145,8 +145,13 @@ function singleStep(client: WebSocket) {
 
   const report = {
     ended: (instruction === null),
-    turtle: turtle
+    turtle: turtle,
+    uid: null
   };
+
+  if (instruction !== null) {
+    report.uid = (instruction as Instruction).uid;
+  }
 
   sendResponse(client, 'vmReport', 'report', report);
 }
